@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<sub-flow name="sys-sitetracker-api-get-site-subflow" doc:id="1495227b-4dac-45ff-9bbc-df132159451e" >
+		<logger level="INFO" doc:name="START - Get Site" doc:id="2b6fbad7-d828-4ee3-81f7-530d5fc899a4" message="START - Get Site | ${sys.sitetracker.path.site} | Query Params: #[vars.queryParams]" category="${app.log.category}"/>
+		<try doc:name="Try" doc:id="c069b4a7-8e02-4cea-ac9d-d9586f29b03a" >
+			<http:request method="GET" doc:name="GET /sys-sitetracker-api/site" doc:id="ebed94d9-6c0f-4061-8ad5-c0d23efe0edd" config-ref="HTTP_Request_configuration_sys-sitetraker-api" path="${sys.sitetracker.path.site}" sendCorrelationId="ALWAYS">
+				<http:headers ><![CDATA[#[output application/java
+---
+{
+	"client-id" : p('sys.sitetracker.client.id'),
+	"client-secret" : p('sys.sitetracker.client.secret'),
+	"Content-Type": "application/json"
+}]]]></http:headers>
+				<http:query-params ><![CDATA[#[vars.queryParams]]]></http:query-params>
+			</http:request>
+			<error-handler >
+				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue - CONNECTION ERROR" doc:id="b889d36b-33a6-4aa2-a516-45f89a709318" type="HTTP:CONNECTIVITY, HTTP:SECURITY, HTTP:TIMEOUT">
+					<logger level="ERROR" doc:name="ERROR - Get Site" doc:id="7ac28543-e04d-4222-afb1-c8134b131df3" message="ERROR - Get Site Exception: #[attributes.error.description]" category="${app.log.category.error}"/>
+				</on-error-continue>
+			</error-handler>
+		</try>
+		<logger level="INFO" doc:name="END - Get Site" doc:id="44569dc7-c77e-4815-9a95-d02c6baa996d" message="END - Get Site | Site Result Count: #[sizeOf(payload)]" category="${app.log.category}"/>
+	</sub-flow>
+</mule>

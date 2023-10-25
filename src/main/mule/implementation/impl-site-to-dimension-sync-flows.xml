@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="impl-site-to-dimension-sync-subflow" doc:id="e1545db1-81b1-4393-a3d5-9fc12f91eca4" >
+		<ee:transform doc:name="Set objKey, defaultValue, resultSummary, currentSyncDate" doc:id="275927ec-5041-4d40-8c6e-6da6a75ebba4" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="objKey" ><![CDATA[%dw 2.0
+output application/java
+---
+p('os.lastsyncdate.key')]]></ee:set-variable>
+				<ee:set-variable variableName="defaultValue" ><![CDATA[%dw 2.0
+output application/java
+---
+p('os.lastsyncdate.default')]]></ee:set-variable>
+				<ee:set-variable variableName="resultSummary" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	success: 0,
+	failed: 0
+}]]></ee:set-variable>
+				<ee:set-variable variableName="currentSyncDate" ><![CDATA[%dw 2.0
+output application/java
+---
+now() as String {format : "yyyy-MM-dd'T'HH:mm:ssxxx"}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="sys-object-store-api-get-record-subflow" doc:id="f138eef9-70c6-43a0-baf5-d4716068665e" name="sys-object-store-api-get-record-subflow" target="lastSyncDate"/>
+		<ee:transform doc:name="Set queryParams" doc:id="c2754586-0236-4ddb-8754-26147277fcb5" >
+			<ee:message >
+			</ee:message>
+			<ee:variables >
+				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
+output application/java
+---
+{
+	lastModifiedDate: vars.lastSyncDate,
+	pageEnabled: true,
+	pageNo: 1,
+	pageSize: 100
+}]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="sys-sitetracker-api-get-site-flow" doc:id="fd78790e-5198-4481-ae89-8614dc4c609e" name="sys-sitetracker-api-get-site-subflow" target="site"/>
+		<choice doc:name="Site Record Found?" doc:id="fbaec6b3-4db4-4c7d-aa68-9d6e2d7bcb94" >
+			<when expression="#[sizeOf(vars.site) &gt; 0]">
+				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" >
+					<try doc:name="Try" doc:id="db282ec1-f22f-42bd-8f15-bee7d58cf89d" >
+						<ee:transform doc:name="Set queryParams" doc:id="05e1316b-5280-4fe6-9ba7-f96f95c6efe5">
+						<ee:message>
+							<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+{
+}]]></ee:set-payload>
+						</ee:message>
+					</ee:transform>
+						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="89dca8ee-87ff-4f83-8c1b-14c472f7f912" name="sys-business-central-api-get-dimension-subflow" target="dimension"/>
+						<choice doc:name="Dimension Already Exist?" doc:id="369a520c-6e02-4ff6-a9fc-da5c3e8c1613" >
+							<when expression="#[sizeOf(vars.dimension) &gt; 0]">
+								<ee:transform doc:name="Set Update Dimension Payload" doc:id="048a2b8f-fbba-4c50-84f6-584c473f7780">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+var site = vars.site
+---
+{
+	"code": site.Site_code__c,
+	"name": site.Name,
+	"blocked": (if (lower(site.sitetracker__Site_Status__c) contains ('decommissioned')) true else false)
+}]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+								<flow-ref doc:name="sys-business-central-api-update-dimension-subflow" doc:id="7e88cfa9-9ffe-404b-ab95-1cdbe64e9996" name="sys-business-central-api-update-dimension-subflow" />
+							</when>
+							<otherwise >
+								<ee:transform doc:name="Set Create Dimension Payload" doc:id="71d93196-d63b-4e91-9c5a-0f493d104ca5" >
+									<ee:message >
+										<ee:set-payload ><![CDATA[%dw 2.0
+output application/json
+var site = vars.site
+---
+{
+	"code": site.Site_code__c,
+	"name": site.Name,
+	"blocked": (if (lower(site.sitetracker__Site_Status__c) contains ('decommissioned')) true else false)
+}]]></ee:set-payload>
+									</ee:message>
+								</ee:transform>
+								<flow-ref doc:name="sys-business-central-api-create-dimension-subflow" doc:id="4cd043e0-b5e9-4ae6-ac42-c0d6723d43a4" name="sys-business-central-api-create-dimension-subflow" />
+							</otherwise>
+						</choice>
+						<ee:transform doc:name="Update Result Summary" doc:id="9f38e188-a756-47d4-9244-45a2644220de">
+					<ee:message />
+					<ee:variables>
+						<ee:set-variable variableName="resultSummary"><![CDATA[%dw 2.0
+output application/java
+var summary = vars.resultSummary
+---
+{
+	success: ((summary.success default 0) + 1),
+	failed: summary.failed
+}]]></ee:set-variable>
+					</ee:variables>
+				</ee:transform>
+						<error-handler >
+							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2cd8a850-283d-4730-b37f-42dc2cbee4f9" >
+								<logger level="ERROR" doc:name="ERROR - Process Site Record" doc:id="26c855a6-71ac-4aea-9675-83a6f77fbc86" message="ERROR - Process Site Record Exception: " category="${app.log.category.error}"/>
+								<ee:transform doc:name="Update Result Summary" doc:id="50bf2c53-cb1c-497f-a84b-82a1b0f844ca" >
+									<ee:message >
+									</ee:message>
+									<ee:variables >
+										<ee:set-variable variableName="resultSummary" ><![CDATA[%dw 2.0
+output application/java
+var summary = vars.resultSummary
+---
+{
+	success: summary.success,
+	failed: ((summary.failed default 0) + 1)
+}]]></ee:set-variable>
+									</ee:variables>
+								</ee:transform>
+							</on-error-continue>
+						</error-handler>
+					</try>
+				</foreach>
+				<logger level="INFO" doc:name="Log Result Summary" doc:id="cc8ab2c9-29b3-4552-955d-8b1ab7e4dfa9" category="${app.log.category}" message="Site to Dimension Summary Result: #[vars.resultSummary] | Sync Date: #[vars.currentSyncDate]"/>
+				<ee:transform doc:name="Update Last Sync Date" doc:id="682674f5-3767-43ef-ba11-f5d85b95524a">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+vars.currentSyncDate]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+				<flow-ref doc:name="sys-object-store-api-store-record-subflow" doc:id="cc258750-e1b4-4ae4-9382-ba9f651411cb" name="sys-object-store-api-store-record-subflow"/>
+			</when>
+			<otherwise >
+				<logger level="INFO" doc:name="No Site Found" doc:id="d450e82b-36dd-48cd-b1b9-21ab53300277" message="No Site Found" category="${app.log.category}"/>
+			</otherwise>
+		</choice>
+	</sub-flow>
+	
+</mule>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:os="http://www.mulesoft.org/schema/mule/os" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	
+	<http:request-config name="HTTP_Request_configuration_sys-sitetraker-api" doc:name="HTTP Request configuration" doc:id="6a4d4a5b-0e7c-4fb8-9b87-0656eb2e6583" basePath="${sys.sitetracker.basepath}" >
+		<http:request-connection protocol="${sys.sitetracker.protocol}" host="${sys.sitetracker.host}" port="${sys.sitetracker.port}" connectionIdleTimeout="${sys.sitetracker.idle.timeout}" >
+			<reconnection >
+				<reconnect frequency="${sys.sitetracker.reconnection.frequency}" count="${sys.sitetracker.reconnection.attempt}" />
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration_sys-business-central-api" doc:name="HTTP Request configuration" doc:id="be49286c-66da-4cff-aa78-20578224b06c" basePath="${sys.bc.basepath}" >
+		<http:request-connection protocol="${sys.bc.protocol}" host="${sys.bc.host}" port="${sys.bc.port}" connectionIdleTimeout="${sys.bc.idle.timeout}" >
+			<reconnection >
+				<reconnect frequency="${sys.bc.reconnection.frequency}" count="${sys.bc.reconnection.attempt}" />
+			</reconnection>
+		</http:request-connection>
+	</http:request-config>
+	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="4c403b45-5a13-433d-ac2b-f77b8267ef36" />
+	<os:object-store name="Object_store" doc:name="Object store" doc:id="38cc614a-d46b-4fa5-81d1-6a68005cba46" entryTtl="${os.entry.ttl}" expirationInterval="${os.entry.expiration.interval}"/>
+	<configuration-properties doc:name="Configuration properties" doc:id="8c8c95c7-f7b4-4019-ac6e-49064243c349" file="config/${env}/config.properties" />
+	<configuration-properties doc:name="Configuration properties" doc:id="94261cb3-4e57-4536-a517-bfb8c203e047" file="config/common/common.properties" />
+</mule>
