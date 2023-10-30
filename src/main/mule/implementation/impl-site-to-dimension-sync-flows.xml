@@ -13,11 +13,11 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 				<ee:set-variable variableName="objKey" ><![CDATA[%dw 2.0
 output application/java
 ---
-p('os.lastsyncdate.key')]]></ee:set-variable>
+Mule::p('os.lastsyncdate.key')]]></ee:set-variable>
 				<ee:set-variable variableName="defaultValue" ><![CDATA[%dw 2.0
 output application/java
 ---
-p('os.lastsyncdate.default')]]></ee:set-variable>
+Mule::p('os.lastsyncdate.default')]]></ee:set-variable>
 				<ee:set-variable variableName="resultSummary" ><![CDATA[%dw 2.0
 output application/java
 ---
@@ -41,9 +41,9 @@ output application/java
 ---
 {
 	lastModifiedDate: vars.lastSyncDate,
-	pageEnabled: true,
-	pageNo: 1,
-	pageSize: 100
+	pageEnabled: Mule::p('sys.sitetracker.pageEnabled') as Boolean,
+	pageNo: Mule::p('sys.sitetracker.pageNo') as Number,
+	pageSize: Mule::p('sys.sitetracker.pageSize') as Number
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
