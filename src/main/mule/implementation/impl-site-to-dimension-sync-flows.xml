@@ -39,6 +39,12 @@ output application/java
 	success: 0,
 	failed: 0
 }]]></ee:set-variable>
+			<ee:set-variable variableName="currentSyncDate" ><![CDATA[%dw 2.0
+output application/java
+---
+now() as String {
+	format : "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+}]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<flow-ref doc:name="sys-object-store-api-get-record-subflow" doc:id="b7a8f8cf-c489-4f0b-9262-03a6f611a9f1" name="sys-object-store-api-get-record-subflow" target="lastSyncDate"/>
@@ -112,28 +118,31 @@ totalRecords]]></ee:set-variable>
 			<when expression="#[sizeOf(vars.site.data) &gt; 0]">
 				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" collection="#[vars.site.data]">
 					<try doc:name="Try" doc:id="db282ec1-f22f-42bd-8f15-bee7d58cf89d" >
-						<ee:transform doc:name="Set queryParams" doc:id="05e1316b-5280-4fe6-9ba7-f96f95c6efe5">
+						<ee:transform doc:name="Set bcQueryParams" doc:id="05e1316b-5280-4fe6-9ba7-f96f95c6efe5">
 						<ee:message>
-							<ee:set-payload><![CDATA[%dw 2.0
-output application/java
+						</ee:message>
+							<ee:variables >
+								<ee:set-variable variableName="bcQueryParams" ><![CDATA[%dw 2.0
+output application/json
 ---
 {
-}]]></ee:set-payload>
-						</ee:message>
+	filter: "code eq '$(vars.site.data[vars.counter].siteCode)'"
+}]]></ee:set-variable>
+							</ee:variables>
 					</ee:transform>
 						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="89dca8ee-87ff-4f83-8c1b-14c472f7f912" name="sys-business-central-api-get-dimension-subflow" target="dimension"/>
 						<choice doc:name="Dimension Already Exist?" doc:id="369a520c-6e02-4ff6-a9fc-da5c3e8c1613" >
-							<when expression="#[sizeOf(vars.dimension) &gt; 0]">
+							<when expression="#[sizeOf(vars.dimension.data) &gt; 0]">
 								<ee:transform doc:name="Set Update Dimension Payload" doc:id="048a2b8f-fbba-4c50-84f6-584c473f7780">
 			<ee:message>
 				<ee:set-payload><![CDATA[%dw 2.0
 output application/json
-var site = vars.site
+var site = vars.site.data
 ---
 {
-	"code": site.Site_code__c,
-	"name": site.Name,
-	"blocked": (if (lower(site.sitetracker__Site_Status__c) contains ('decommissioned')) true else false)
+	"dimensionCode": site[vars.counter].siteCode,
+	"name": site[vars.counter].siteName,
+	"blocked": (if (lower(site[vars.counter].siteStatus) contains ('decommissioned')) true else false)
 }]]></ee:set-payload>
 			</ee:message>
 		</ee:transform>
@@ -144,12 +153,14 @@ var site = vars.site
 									<ee:message >
 										<ee:set-payload ><![CDATA[%dw 2.0
 output application/json
-var site = vars.site
+var site = vars.site.data
+var dimension = vars.dimension.data
 ---
 {
-	"code": site.Site_code__c,
-	"name": site.Name,
-	"blocked": (if (lower(site.sitetracker__Site_Status__c) contains ('decommissioned')) true else false)
+	"dimensionCode": site[vars.counter].siteCode,
+	"code": dimension[vars.counter].siteCode,
+	"name": site[vars.counter].siteName,
+	"blocked": (if (lower(site[vars.counter].siteStatus) contains ('decommissioned')) true else false)
 }]]></ee:set-payload>
 									</ee:message>
 								</ee:transform>

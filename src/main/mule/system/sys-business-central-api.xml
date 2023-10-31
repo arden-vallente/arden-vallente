@@ -14,7 +14,8 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 {
 	"client-id" : p('sys.bc.client.id'),
 	"client-secret" : p('sys.bc.client.secret'),
-	"Content-Type": "application/json"
+	"Content-Type": "application/json",
+	"company": p('sys.bc.company.header')
 }]]]></http:headers>
 		</http:request>
 			<error-handler ref="system-error-handler" />
@@ -32,8 +33,10 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 {
 	"client-id" : p('sys.bc.client.id'),
 	"client-secret" : p('sys.bc.client.secret'),
-	"Content-Type": "application/json"
+	"Content-Type": "application/json",
+	"company": p('sys.bc.company.header')
 }]]]></http:headers>
+					<http:query-params ><![CDATA[#[vars.bcQueryParams]]]></http:query-params>
 		</http:request>
 			<error-handler ref="system-error-handler" />
 		</try>
@@ -50,7 +53,8 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 {
 	"client-id" : p('sys.bc.client.id'),
 	"client-secret" : p('sys.bc.client.secret'),
-	"Content-Type": "application/json"
+	"Content-Type": "application/json",
+	"company": p('sys.bc.company.header')
 }]]]></http:headers>
 		</http:request>
 			<error-handler ref="system-error-handler" />
