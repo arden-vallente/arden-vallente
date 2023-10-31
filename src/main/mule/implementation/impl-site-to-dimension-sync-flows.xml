@@ -5,8 +5,9 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
-	<sub-flow name="impl-site-to-dimension-sync-subflow" doc:id="e1545db1-81b1-4393-a3d5-9fc12f91eca4" >
-		<ee:transform doc:name="Set objKey, defaultValue, resultSummary, currentSyncDate" doc:id="275927ec-5041-4d40-8c6e-6da6a75ebba4" >
+	<sub-flow name="impl-site-to-dimension-sync-subflow" doc:id="adf98f0d-ec0a-47c8-a6af-17a0e9f53c2d" >
+		<logger level="INFO" doc:name="START - GET Site Implem" doc:id="2d4aebab-28fd-4da8-acab-46dc6a9a94c6" category="${app.log.category}" message="START - GET Site Implem"/>
+		<ee:transform doc:name="Set OS Key, DefaultValue, pageNo, resultSummary" doc:id="c6cecd10-eb2f-44b8-9004-c76eb2c7743a" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
@@ -18,6 +19,19 @@ Mule::p('os.lastsyncdate.key')]]></ee:set-variable>
 output application/java
 ---
 Mule::p('os.lastsyncdate.default')]]></ee:set-variable>
+				<ee:set-variable variableName="pageNo" ><![CDATA[%dw 2.0
+output application/java
+---
+1]]></ee:set-variable>
+				<ee:set-variable variableName="pageSize" ><![CDATA[%dw 2.0
+import p from Mule
+output application/java
+---
+p('app.page.size') as Number]]></ee:set-variable>
+				<ee:set-variable variableName="retrieveRecordCount" ><![CDATA[%dw 2.0
+output application/java
+---
+0]]></ee:set-variable>
 				<ee:set-variable variableName="resultSummary" ><![CDATA[%dw 2.0
 output application/java
 ---
@@ -25,32 +39,78 @@ output application/java
 	success: 0,
 	failed: 0
 }]]></ee:set-variable>
-				<ee:set-variable variableName="currentSyncDate" ><![CDATA[%dw 2.0
-output application/java
----
-now() as String {format : "yyyy-MM-dd'T'HH:mm:ssxxx"}]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<flow-ref doc:name="sys-object-store-api-get-record-subflow" doc:id="f138eef9-70c6-43a0-baf5-d4716068665e" name="sys-object-store-api-get-record-subflow" target="lastSyncDate"/>
+		<flow-ref doc:name="sys-object-store-api-get-record-subflow" doc:id="b7a8f8cf-c489-4f0b-9262-03a6f611a9f1" name="sys-object-store-api-get-record-subflow" target="lastSyncDate"/>
+		<ee:transform doc:name="Set Paging Variables" doc:id="0e8df26f-3955-4248-9bfd-3666f3950451" >
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="pageNo" ><![CDATA[%dw 2.0
+output application/java
+---
+1]]></ee:set-variable>
+				<ee:set-variable variableName="pageSize" ><![CDATA[%dw 2.0
+import p from Mule
+output application/java
+---
+p('app.page.size') as Number]]></ee:set-variable>
+				<ee:set-variable variableName="lastModifiedDate" ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-variable>
+				<ee:set-variable variableName="totalRecordCount" ><![CDATA[%dw 2.0
+output application/java
+---
+0]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
+		<flow-ref doc:name="impl-site-to-dimension-paging-subflow" doc:id="7967d5f1-9ad5-4126-8402-308c2b3b8bb6" name="impl-site-to-dimension-paging-subflow"/>
+		<logger level="INFO" doc:name="Log Project to Job Summary" doc:id="e4251ed2-a92a-4ee4-916b-df24a08ec52f" message="Project to Job Summary Result: #[vars.resultSummary] | Sync Date: #[vars.currentSyncDate]" category="${app.log.category}" />
+		<ee:transform doc:name="Update Last Sync Date" doc:id="1f51a0d7-c9a5-43b6-83f8-5fa17e7c6529">
+					<ee:message>
+						<ee:set-payload><![CDATA[%dw 2.0
+output application/java
+---
+vars.currentSyncDate]]></ee:set-payload>
+					</ee:message>
+				</ee:transform>
+		<flow-ref doc:name="sys-object-store-api-store-record-subflow" doc:id="1ce7e94e-9cd2-416a-85e1-cc2b0ff127b7" name="sys-object-store-api-store-record-subflow" />
+		<logger level="INFO" doc:name="END - GET Site Implem" doc:id="b5558996-eb16-4f85-9a83-64b488c95c79" message="END - GET Site Implem" category="${app.log.category}"/>
+	</sub-flow>
+	<sub-flow name="impl-site-to-dimension-paging-subflow" doc:id="e1545db1-81b1-4393-a3d5-9fc12f91eca4" >
+		<logger level="INFO" doc:name="START - Get Site Impl Paging" doc:id="d7f0dd59-3053-418e-a74b-1c82fcc0e961" message="START - Get Site Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}"/>
 		<ee:transform doc:name="Set queryParams" doc:id="c2754586-0236-4ddb-8754-26147277fcb5" >
 			<ee:message >
 			</ee:message>
 			<ee:variables >
 				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
-output application/java
+import p from Mule
+output application/json
 ---
 {
-	lastModifiedDate: vars.lastSyncDate,
-	pageEnabled: Mule::p('sys.sitetracker.pageEnabled') as Boolean,
-	pageNo: Mule::p('sys.sitetracker.pageNo') as Number,
-	pageSize: Mule::p('sys.sitetracker.pageSize') as Number
+	"pageEnabled": p('app.page.enabled') as Boolean,
+	"pageNo": vars.pageNo as Number,
+	"pageSize": p('app.page.size') as Number,
+	"lastModifiedDate": vars.lastSyncDate
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
 		<flow-ref doc:name="sys-sitetracker-api-get-site-flow" doc:id="fd78790e-5198-4481-ae89-8614dc4c609e" name="sys-sitetracker-api-get-site-subflow" target="site"/>
+		<ee:transform doc:name="Set retrieveRecodCount" doc:id="ef697910-6c2b-479c-be68-de79916bc9c2">
+			<ee:message>
+			</ee:message>
+			<ee:variables>
+				<ee:set-variable variableName="retrieveRecordCount" ><![CDATA[%dw 2.0
+output application/java
+var totalRecords = vars.retrieveRecordCount + sizeOf(vars.site.data)
+---
+totalRecords]]></ee:set-variable>
+			</ee:variables>
+		</ee:transform>
 		<choice doc:name="Site Record Found?" doc:id="fbaec6b3-4db4-4c7d-aa68-9d6e2d7bcb94" >
-			<when expression="#[sizeOf(vars.site) &gt; 0]">
-				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" >
+			<when expression="#[sizeOf(vars.site.data) &gt; 0]">
+				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" collection="#[vars.site.data]">
 					<try doc:name="Try" doc:id="db282ec1-f22f-42bd-8f15-bee7d58cf89d" >
 						<ee:transform doc:name="Set queryParams" doc:id="05e1316b-5280-4fe6-9ba7-f96f95c6efe5">
 						<ee:message>
@@ -130,21 +190,32 @@ var summary = vars.resultSummary
 						</error-handler>
 					</try>
 				</foreach>
-				<logger level="INFO" doc:name="Log Result Summary" doc:id="cc8ab2c9-29b3-4552-955d-8b1ab7e4dfa9" category="${app.log.category}" message="Site to Dimension Summary Result: #[vars.resultSummary] | Sync Date: #[vars.currentSyncDate]"/>
-				<ee:transform doc:name="Update Last Sync Date" doc:id="682674f5-3767-43ef-ba11-f5d85b95524a">
+				</when>
+				<otherwise >
+					<logger level="INFO" doc:name="No Site Found" doc:id="67cd0916-4dd5-4d3a-8bd6-7bcf4885a86c" message="No Site Found" category="${app.log.category}"/>
+				</otherwise>
+				</choice>
+				<choice doc:name="Check pageNo" doc:id="f8fcaf40-7973-4d30-865d-5fa245bef7a3">
+			<when expression="#[sizeOf(vars.project.data) == p('app.page.size') as Number]">
+				<ee:transform doc:name="Set pageNo" doc:id="6864060c-5cee-46b7-baab-695d695ee367">
 					<ee:message>
-						<ee:set-payload><![CDATA[%dw 2.0
-output application/java
----
-vars.currentSyncDate]]></ee:set-payload>
 					</ee:message>
+					<ee:variables>
+						<ee:set-variable variableName="pageNo"><![CDATA[%dw 2.0
+output application/java
+var nextPage = vars.pageNo as Number + 1
+---
+nextPage]]></ee:set-variable>
+					</ee:variables>
 				</ee:transform>
-				<flow-ref doc:name="sys-object-store-api-store-record-subflow" doc:id="cc258750-e1b4-4ae4-9382-ba9f651411cb" name="sys-object-store-api-store-record-subflow"/>
+				<logger level="INFO" doc:name="With next page" doc:id="cb757823-fcbd-42dd-a4ed-a17f7f91a948" message="With next page branch. Next pageNo :  #[vars.pageNo] " category="${app.log.category}" />
+				<flow-ref doc:name="impl-site-to-dimension-paging-subflow" doc:id="0e2079bc-9440-48d0-9392-d5f3caf105b5" name="impl-site-to-dimension-paging-subflow" />
 			</when>
-			<otherwise >
-				<logger level="INFO" doc:name="No Site Found" doc:id="d450e82b-36dd-48cd-b1b9-21ab53300277" message="No Site Found" category="${app.log.category}"/>
+			<otherwise>
+				<logger level="INFO" doc:name="Last page" doc:id="54f79cc0-e787-4933-8209-4be89b40f2db" message="Last page. Record count: #[sizeOf(vars.project.data)] | Total Records: #[vars.retrieveRecordCount]" category="${app.log.category}"/>
 			</otherwise>
 		</choice>
+		<logger level="INFO" doc:name="END - Get Project Impl Paging" doc:id="9897163c-3bd2-4f9b-a286-32dd930e4cab" message="END - Get Project Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}"/>
 	</sub-flow>
 	
 </mule>

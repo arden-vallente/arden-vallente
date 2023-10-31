@@ -8,7 +8,8 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<logger level="INFO" doc:name="START - Create Dimension" doc:id="eada82da-dc6b-41c7-96bf-550e41822a93" message="START - Create Dimension" category="${app.log.category}"/>
 		<try doc:name="Try" doc:id="6f5dac43-e4cb-492a-bdc3-2a4190037413">
 			<http:request method="POST" doc:name="POST /sys-business-central-api/dimension" doc:id="1f741914-5f91-4adb-8462-465b7f61d373" config-ref="HTTP_Request_configuration_sys-business-central-api" path="${sys.bc.path.dimension}" sendCorrelationId="ALWAYS">
-			<http:headers><![CDATA[#[output application/java
+			<error-mapping sourceType="HTTP:CONNECTIVITY" targetType="FS:CONNECTIVITY" />
+				<http:headers><![CDATA[#[output application/java
 ---
 {
 	"client-id" : p('sys.bc.client.id'),
@@ -16,18 +17,16 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	"Content-Type": "application/json"
 }]]]></http:headers>
 		</http:request>
-			<error-handler>
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue - CONNECTION ERROR" doc:id="6d352c4f-0b91-4c21-8bad-e579451647de" type="HTTP:CONNECTIVITY, HTTP:SECURITY, HTTP:TIMEOUT">
-					<logger level="ERROR" doc:name="ERROR - Create Dimension" doc:id="1172e4eb-9dbf-4c63-9f79-aa8b471516f8" message="ERROR - Create Dimension Exception: #[attributes.error.description]" category="${app.log.category.error}" />
-				</on-error-continue>
-			</error-handler>
+			<error-handler ref="system-error-handler" />
 		</try>
 		<logger level="INFO" doc:name="END - Create Dimension" doc:id="1ddac0b4-5fc4-461b-bc32-2192371363b6" category="${app.log.category}" message="END - Create Dimension"/>
 	</sub-flow>
 	<sub-flow name="sys-business-central-api-get-dimension-subflow" doc:id="d7d95f39-5432-4d34-8718-6f8c1989e376" >
 		<logger level="INFO" doc:name="START - Get Dimension" doc:id="24ff1703-aff8-4607-8414-83c7431a4be0" category="${app.log.category}" message="START - Get Dimension"/>
+		<until-successful maxRetries="${retry.attempt.max}" doc:name="Until Succesful" doc:id="3c4751c5-2268-4810-aebf-c3ab7734aca5" millisBetweenRetries="${retry.attempt.wait}">
 		<try doc:name="Try" doc:id="0d6f4bc0-79fb-4db0-9031-c772a8f84e4c">
 			<http:request method="GET" doc:name="GET /sys-business-central-api/dimension" doc:id="b48635ed-9687-46d9-9dcf-14f9792fa722" config-ref="HTTP_Request_configuration_sys-business-central-api" path="${sys.bc.path.dimension}" sendCorrelationId="ALWAYS">
+			<error-mapping sourceType="HTTP:CONNECTIVITY" targetType="FS:CONNECTIVITY" />
 			<http:headers><![CDATA[#[output application/java
 ---
 {
@@ -36,18 +35,16 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	"Content-Type": "application/json"
 }]]]></http:headers>
 		</http:request>
-			<error-handler>
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue - CONNECTION ERROR" doc:id="02891818-6797-4688-9be2-e0acff9b1c66" type="HTTP:CONNECTIVITY, HTTP:SECURITY, HTTP:TIMEOUT">
-					<logger level="ERROR" doc:name="ERROR - Get Dimension" doc:id="4090f2fb-c18d-4674-9fd0-7cc779742bd4" message="ERROR - Get Dimension Exception: #[attributes.error.description]" category="${app.log.category.error}" />
-				</on-error-continue>
-			</error-handler>
+			<error-handler ref="system-error-handler" />
 		</try>
+		</until-successful>
 		<logger level="INFO" doc:name="END - Get Dimension" doc:id="73ad7272-0a91-4d34-92fb-443860964e2e" category="${app.log.category}" message="END - Get Dimension"/>
 	</sub-flow>
 	<sub-flow name="sys-business-central-api-update-dimension-subflow" doc:id="a7adf576-e63a-4926-a731-aae0e2ec0ab2" >
 		<logger level="INFO" doc:name="START - Update Dimension" doc:id="faebbed2-6164-457f-96f6-72349ffae04e" message="START - Update Dimension" category="${app.log.category}"/>
 		<try doc:name="Try" doc:id="57f92e9f-ca1f-4c0a-abc8-3a00b7023415">
 			<http:request method="PATCH" doc:name="PATCH /sys-business-central-api/dimension" doc:id="7c99f086-b0e3-49a8-8731-50e74b19b1a8" config-ref="HTTP_Request_configuration_sys-business-central-api" path="${sys.bc.path.dimension}" sendCorrelationId="ALWAYS">
+			<error-mapping sourceType="HTTP:CONNECTIVITY" targetType="FS:CONNECTIVITY" />
 			<http:headers><![CDATA[#[output application/java
 ---
 {
@@ -56,11 +53,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	"Content-Type": "application/json"
 }]]]></http:headers>
 		</http:request>
-			<error-handler>
-				<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue - CONNECTION ERROR" doc:id="ddc996c7-5b87-4a30-bb09-5e4fbc884835" type="HTTP:CONNECTIVITY, HTTP:SECURITY, HTTP:TIMEOUT">
-					<logger level="ERROR" doc:name="ERROR - Patch Dimension" doc:id="84bb9383-06f3-4401-96d4-b8c8e78d4161" message="ERROR - Patch Dimension Exception: #[attributes.error.description]" category="${app.log.category.error}" />
-				</on-error-continue>
-			</error-handler>
+			<error-handler ref="system-error-handler" />
 		</try>
 		<logger level="INFO" doc:name="END - Update Dimension" doc:id="b6fd46e4-b008-47ea-990f-220fa0196d25" message="END - Update Dimension" category="${app.log.category}" />
 	</sub-flow>
