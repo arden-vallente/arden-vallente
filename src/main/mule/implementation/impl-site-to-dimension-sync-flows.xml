@@ -118,7 +118,7 @@ totalRecords]]></ee:set-variable>
 			<when expression="#[sizeOf(vars.site.data) &gt; 0]">
 				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" collection="#[vars.site.data]">
 					<choice doc:name="SiteCode is not empty?" doc:id="e17ada41-5082-49af-bf1f-82088b90bb91" >
-						<when expression="#[!isEmpty(vars.site.data[vars.counter].siteCode)]">
+						<when expression="#[!isEmpty(payload.siteCode)]">
 						<try doc:name="Try" doc:id="f64ab517-7caa-42a1-8494-8d572974998c" >
 						<ee:transform doc:name="Set bcQueryParams" doc:id="1648964e-0779-41b2-a449-3bd6c1d034fc">
 						<ee:message>
@@ -128,7 +128,7 @@ totalRecords]]></ee:set-variable>
 output application/json
 ---
 {
-	filter: "code eq '$(vars.site.data[vars.counter].siteCode)'"
+	filter: "code eq '$(payload.siteCode)'"
 }]]></ee:set-variable>
 							</ee:variables>
 					</ee:transform>
@@ -144,9 +144,7 @@ output application/json
 output application/java
 var dimension = vars.dimension.data
 ---
-if ( sizeOf(dimension) > 1 ) {
-	dimensionId: dimension[vars.counter].systemId
-} else {
+{
 	dimensionId: dimension[0].systemId
 }]]></ee:set-variable>
 									</ee:variables>
@@ -171,7 +169,8 @@ var summary = vars.resultSummary
 ---
 {
 	success: ((summary.success default 0) + 1),
-	failed: summary.failed
+	failed: summary.failed,
+	emptySiteCode: summary.emptySiteCode 
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
@@ -188,7 +187,8 @@ var summary = vars.resultSummary
 ---
 {
 	success: summary.success,
-	failed: ((summary.failed default 0) + 1)
+	failed: ((summary.failed default 0) + 1),
+	emptySiteCode: summary.emptySiteCode 
 }]]></ee:set-variable>
 									</ee:variables>
 								</ee:transform>
@@ -197,7 +197,21 @@ var summary = vars.resultSummary
 					</try>
 						</when>
 						<otherwise >
-							<logger level="INFO" doc:name="No Site Code Found" doc:id="be1bbe6a-aa41-449b-80d7-de316b7530f1" message='#[output application/json&#10;---&#10;"No Site Code Found - $(vars.site.data[vars.counter].id)"]' category="${app.log.category}"/>
+							<logger level="INFO" doc:name="No Site Code Found" doc:id="be1bbe6a-aa41-449b-80d7-de316b7530f1" message='#[output application/json&#10;---&#10;"No Site Code Found - $(payload.id)"]' category="${app.log.category}"/>
+							<ee:transform doc:name="Update Result Summary" doc:id="d7fd11f4-9522-4bc2-9557-fa08d3e59108" >
+								<ee:message />
+								<ee:variables >
+									<ee:set-variable variableName="resultSummary" ><![CDATA[%dw 2.0
+output application/java
+var summary = vars.resultSummary
+---
+{
+	success: summary.success,
+	failed: summary.failed,
+	emptySiteCode: ((summary.emptySiteCode default 0) + 1)
+}]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
 						</otherwise>
 					</choice>
 					
@@ -208,7 +222,7 @@ var summary = vars.resultSummary
 				</otherwise>
 				</choice>
 				<choice doc:name="Check pageNo" doc:id="f8fcaf40-7973-4d30-865d-5fa245bef7a3">
-			<when expression="#[sizeOf(vars.project.data) == p('app.page.size') as Number]">
+			<when expression="#[sizeOf(vars.site.data) == p('app.page.size') as Number]">
 				<ee:transform doc:name="Set pageNo" doc:id="6864060c-5cee-46b7-baab-695d695ee367">
 					<ee:message>
 					</ee:message>
@@ -225,9 +239,9 @@ nextPage]]></ee:set-variable>
 			</when>
 			<otherwise>
 				<logger level="INFO" doc:name="Last page" doc:id="54f79cc0-e787-4933-8209-4be89b40f2db" message="Last page. Record count: #[sizeOf(vars.site.data)] | Total Records: #[vars.retrieveRecordCount]" category="${app.log.category}"/>
+				<logger level="INFO" doc:name="END - Get Project Impl Paging" doc:id="9897163c-3bd2-4f9b-a286-32dd930e4cab" message="END - Get Project Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}" />
 			</otherwise>
 		</choice>
-		<logger level="INFO" doc:name="END - Get Project Impl Paging" doc:id="9897163c-3bd2-4f9b-a286-32dd930e4cab" message="END - Get Project Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}"/>
 	</sub-flow>
 	
 </mule>
