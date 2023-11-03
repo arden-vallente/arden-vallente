@@ -36,7 +36,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	"Content-Type": "application/json",
 	"company": p('sys.bc.company.header')
 }]]]></http:headers>
-					<http:query-params ><![CDATA[#[vars.bcQueryParams]]]></http:query-params>
+					<http:query-params ><![CDATA[#[(vars.bcQueryParams)]]]></http:query-params>
 		</http:request>
 			<error-handler ref="system-error-handler" />
 		</try>
@@ -46,7 +46,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	<sub-flow name="sys-business-central-api-update-dimension-subflow" doc:id="a7adf576-e63a-4926-a731-aae0e2ec0ab2" >
 		<logger level="INFO" doc:name="START - Update Dimension" doc:id="faebbed2-6164-457f-96f6-72349ffae04e" message="START - Update Dimension" category="${app.log.category}"/>
 		<try doc:name="Try" doc:id="57f92e9f-ca1f-4c0a-abc8-3a00b7023415">
-			<http:request method="PATCH" doc:name="PATCH /sys-business-central-api/dimension" doc:id="7c99f086-b0e3-49a8-8731-50e74b19b1a8" config-ref="HTTP_Request_configuration_sys-business-central-api" path="${sys.bc.path.dimension}" sendCorrelationId="ALWAYS">
+			<http:request method="PATCH" doc:name="PATCH /sys-business-central-api/dimension" doc:id="7c99f086-b0e3-49a8-8731-50e74b19b1a8" config-ref="HTTP_Request_configuration_sys-business-central-api" path="${sys.bc.path.dimension.update}" sendCorrelationId="ALWAYS">
 			<error-mapping sourceType="HTTP:CONNECTIVITY" targetType="FS:CONNECTIVITY" />
 			<http:headers><![CDATA[#[output application/java
 ---
@@ -56,6 +56,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 	"Content-Type": "application/json",
 	"company": p('sys.bc.company.header')
 }]]]></http:headers>
+				<http:uri-params ><![CDATA[#[vars.uriParams]]]></http:uri-params>
 		</http:request>
 			<error-handler ref="system-error-handler" />
 		</try>

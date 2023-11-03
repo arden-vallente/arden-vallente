@@ -123,11 +123,11 @@ totalRecords]]></ee:set-variable>
 						</ee:message>
 							<ee:variables >
 								<ee:set-variable variableName="bcQueryParams" ><![CDATA[%dw 2.0
-output application/json
+output application/java
 ---
-{
+if(!isEmpty(vars.site.data[vars.counter].siteCode)) {
 	filter: "code eq '$(vars.site.data[vars.counter].siteCode)'"
-}]]></ee:set-variable>
+} else {}]]></ee:set-variable>
 							</ee:variables>
 					</ee:transform>
 						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="89dca8ee-87ff-4f83-8c1b-14c472f7f912" name="sys-business-central-api-get-dimension-subflow" target="dimension"/>
@@ -135,33 +135,26 @@ output application/json
 							<when expression="#[sizeOf(vars.dimension.data) &gt; 0]">
 								<ee:transform doc:name="Set Update Dimension Payload" doc:id="048a2b8f-fbba-4c50-84f6-584c473f7780">
 			<ee:message>
-				<ee:set-payload><![CDATA[%dw 2.0
-output application/json
-var site = vars.site.data
----
-{
-	"dimensionCode": site[vars.counter].siteCode,
-	"name": site[vars.counter].siteName,
-	"blocked": (if (lower(site[vars.counter].siteStatus) contains ('decommissioned')) true else false)
-}]]></ee:set-payload>
+										<ee:set-payload resource="dwl/request/dwl-update-dimension-request.dwl" />
 			</ee:message>
+									<ee:variables >
+										<ee:set-variable variableName="uriParams" ><![CDATA[%dw 2.0
+output application/java
+var dimension = vars.dimension.data
+---
+if ( sizeOf(dimension) > 1 ) {
+	dimensionId: dimension[vars.counter].systemId
+} else {
+	dimensionId: dimension[0].systemId
+}]]></ee:set-variable>
+									</ee:variables>
 		</ee:transform>
 								<flow-ref doc:name="sys-business-central-api-update-dimension-subflow" doc:id="7e88cfa9-9ffe-404b-ab95-1cdbe64e9996" name="sys-business-central-api-update-dimension-subflow" />
 							</when>
 							<otherwise >
 								<ee:transform doc:name="Set Create Dimension Payload" doc:id="71d93196-d63b-4e91-9c5a-0f493d104ca5" >
 									<ee:message >
-										<ee:set-payload ><![CDATA[%dw 2.0
-output application/json
-var site = vars.site.data
-var dimension = vars.dimension.data
----
-{
-	"dimensionCode": site[vars.counter].siteCode,
-	"code": dimension[vars.counter].siteCode,
-	"name": site[vars.counter].siteName,
-	"blocked": (if (lower(site[vars.counter].siteStatus) contains ('decommissioned')) true else false)
-}]]></ee:set-payload>
+										<ee:set-payload resource="dwl/request/dwl-create-dimension-request.dwl" />
 									</ee:message>
 								</ee:transform>
 								<flow-ref doc:name="sys-business-central-api-create-dimension-subflow" doc:id="4cd043e0-b5e9-4ae6-ac42-c0d6723d43a4" name="sys-business-central-api-create-dimension-subflow" />
