@@ -117,23 +117,25 @@ totalRecords]]></ee:set-variable>
 		<choice doc:name="Site Record Found?" doc:id="fbaec6b3-4db4-4c7d-aa68-9d6e2d7bcb94" >
 			<when expression="#[sizeOf(vars.site.data) &gt; 0]">
 				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" collection="#[vars.site.data]">
-					<try doc:name="Try" doc:id="db282ec1-f22f-42bd-8f15-bee7d58cf89d" >
-						<ee:transform doc:name="Set bcQueryParams" doc:id="05e1316b-5280-4fe6-9ba7-f96f95c6efe5">
+					<choice doc:name="SiteCode is not empty?" doc:id="e17ada41-5082-49af-bf1f-82088b90bb91" >
+						<when expression="#[!isEmpty(vars.site.data[vars.counter].siteCode)]">
+						<try doc:name="Try" doc:id="f64ab517-7caa-42a1-8494-8d572974998c" >
+						<ee:transform doc:name="Set bcQueryParams" doc:id="1648964e-0779-41b2-a449-3bd6c1d034fc">
 						<ee:message>
 						</ee:message>
-							<ee:variables >
-								<ee:set-variable variableName="bcQueryParams" ><![CDATA[%dw 2.0
-output application/java
+							<ee:variables>
+								<ee:set-variable variableName="bcQueryParams"><![CDATA[%dw 2.0
+output application/json
 ---
-if(!isEmpty(vars.site.data[vars.counter].siteCode)) {
+{
 	filter: "code eq '$(vars.site.data[vars.counter].siteCode)'"
-} else {}]]></ee:set-variable>
+}]]></ee:set-variable>
 							</ee:variables>
 					</ee:transform>
-						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="89dca8ee-87ff-4f83-8c1b-14c472f7f912" name="sys-business-central-api-get-dimension-subflow" target="dimension"/>
-						<choice doc:name="Dimension Already Exist?" doc:id="369a520c-6e02-4ff6-a9fc-da5c3e8c1613" >
+						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="2ba18ceb-9eb2-4217-8dc0-06a3f22f4ecf" name="sys-business-central-api-get-dimension-subflow" target="dimension"/>
+						<choice doc:name="Dimension Already Exist?" doc:id="744f4d4b-2ecc-4183-9f29-9c3caf61a032" >
 							<when expression="#[sizeOf(vars.dimension.data) &gt; 0]">
-								<ee:transform doc:name="Set Update Dimension Payload" doc:id="048a2b8f-fbba-4c50-84f6-584c473f7780">
+								<ee:transform doc:name="Set Update Dimension Payload" doc:id="f99bada9-a9a6-450e-bb6e-9e1cffae13bb">
 			<ee:message>
 										<ee:set-payload resource="dwl/request/dwl-update-dimension-request.dwl" />
 			</ee:message>
@@ -149,18 +151,18 @@ if ( sizeOf(dimension) > 1 ) {
 }]]></ee:set-variable>
 									</ee:variables>
 		</ee:transform>
-								<flow-ref doc:name="sys-business-central-api-update-dimension-subflow" doc:id="7e88cfa9-9ffe-404b-ab95-1cdbe64e9996" name="sys-business-central-api-update-dimension-subflow" />
+								<flow-ref doc:name="sys-business-central-api-update-dimension-subflow" doc:id="77325261-534f-4d84-a1f3-234a16187910" name="sys-business-central-api-update-dimension-subflow" />
 							</when>
 							<otherwise >
-								<ee:transform doc:name="Set Create Dimension Payload" doc:id="71d93196-d63b-4e91-9c5a-0f493d104ca5" >
+								<ee:transform doc:name="Set Create Dimension Payload" doc:id="d6e224ff-0207-4b89-b0e0-e28c68fc4e07" >
 									<ee:message >
 										<ee:set-payload resource="dwl/request/dwl-create-dimension-request.dwl" />
 									</ee:message>
 								</ee:transform>
-								<flow-ref doc:name="sys-business-central-api-create-dimension-subflow" doc:id="4cd043e0-b5e9-4ae6-ac42-c0d6723d43a4" name="sys-business-central-api-create-dimension-subflow" />
+								<flow-ref doc:name="sys-business-central-api-create-dimension-subflow" doc:id="4fd23077-52ab-42db-a0ec-eb4d9b36adf4" name="sys-business-central-api-create-dimension-subflow" />
 							</otherwise>
 						</choice>
-						<ee:transform doc:name="Update Result Summary" doc:id="9f38e188-a756-47d4-9244-45a2644220de">
+						<ee:transform doc:name="Update Result Summary" doc:id="a3c28160-4728-46e9-8b44-0a45f759499c">
 					<ee:message />
 					<ee:variables>
 						<ee:set-variable variableName="resultSummary"><![CDATA[%dw 2.0
@@ -174,9 +176,9 @@ var summary = vars.resultSummary
 					</ee:variables>
 				</ee:transform>
 						<error-handler >
-							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="2cd8a850-283d-4730-b37f-42dc2cbee4f9" >
-								<logger level="ERROR" doc:name="ERROR - Process Site Record" doc:id="26c855a6-71ac-4aea-9675-83a6f77fbc86" message="ERROR - Process Site Record Exception: " category="${app.log.category.error}"/>
-								<ee:transform doc:name="Update Result Summary" doc:id="50bf2c53-cb1c-497f-a84b-82a1b0f844ca" >
+							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="60a70564-6ccf-425a-8514-a28bf97d65b6" >
+								<logger level="ERROR" doc:name="ERROR - Process Site Record" doc:id="e7227844-0773-4ddb-b120-6355a2c9896f" message="ERROR - Process Site Record Exception: " category="${app.log.category.error}"/>
+								<ee:transform doc:name="Update Result Summary" doc:id="91ae638b-62eb-4e79-a80e-ec25b12310b2" >
 									<ee:message >
 									</ee:message>
 									<ee:variables >
@@ -193,6 +195,12 @@ var summary = vars.resultSummary
 							</on-error-continue>
 						</error-handler>
 					</try>
+						</when>
+						<otherwise >
+							<logger level="INFO" doc:name="No Site Code Found" doc:id="be1bbe6a-aa41-449b-80d7-de316b7530f1" message='#[output application/json&#10;---&#10;"No Site Code Found - $(vars.site.data[vars.counter].id)"]' category="${app.log.category}"/>
+						</otherwise>
+					</choice>
+					
 				</foreach>
 				</when>
 				<otherwise >
@@ -216,7 +224,7 @@ nextPage]]></ee:set-variable>
 				<flow-ref doc:name="impl-site-to-dimension-paging-subflow" doc:id="0e2079bc-9440-48d0-9392-d5f3caf105b5" name="impl-site-to-dimension-paging-subflow" />
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Last page" doc:id="54f79cc0-e787-4933-8209-4be89b40f2db" message="Last page. Record count: #[sizeOf(vars.project.data)] | Total Records: #[vars.retrieveRecordCount]" category="${app.log.category}"/>
+				<logger level="INFO" doc:name="Last page" doc:id="54f79cc0-e787-4933-8209-4be89b40f2db" message="Last page. Record count: #[sizeOf(vars.site.data)] | Total Records: #[vars.retrieveRecordCount]" category="${app.log.category}"/>
 			</otherwise>
 		</choice>
 		<logger level="INFO" doc:name="END - Get Project Impl Paging" doc:id="9897163c-3bd2-4f9b-a286-32dd930e4cab" message="END - Get Project Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}"/>
