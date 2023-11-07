@@ -1,0 +1,14 @@
+{
+    "data": {
+      "@odata.context": "https://api.businesscentral.dynamics.com/v2.0/446f6e6f-02e1-43db-93d3-3c70e98eb78d/Capgemini_DEV/api/capgemini/integration/v1.0/$metadata#companies('Aotearoa%20Towers%20Group%20LP')/dimensionValues/$entity",
+      "@odata.etag": "W/JzE5Ozg5NzE1NzE4NzQxNTg4Mzg1MjYxOzAwOyc=",
+      "systemId": "23c263f4-ea79-ee11-817a-00224898866e",
+      "dimensionCode": "SITEID",
+      "code": "MP006",
+      "name": "Mahendra-Test Site 6",
+      "globalDimensionNo": 2,
+      "blocked": false,
+      "systemModifiedAt": "2023-11-07T03:25:00.7Z",
+      "systemCreatedAt": "2023-11-03T01:47:33.51Z"
+    }
+  }

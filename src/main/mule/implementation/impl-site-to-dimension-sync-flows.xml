@@ -45,34 +45,19 @@ output application/java
 now() as String {
 	format : "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
 }]]></ee:set-variable>
-			</ee:variables>
-		</ee:transform>
-		<flow-ref doc:name="sys-object-store-api-get-record-subflow" doc:id="b7a8f8cf-c489-4f0b-9262-03a6f611a9f1" name="sys-object-store-api-get-record-subflow" target="lastSyncDate"/>
-		<ee:transform doc:name="Set Paging Variables" doc:id="0e8df26f-3955-4248-9bfd-3666f3950451" >
-			<ee:message>
-			</ee:message>
-			<ee:variables>
-				<ee:set-variable variableName="pageNo" ><![CDATA[%dw 2.0
-output application/java
----
-1]]></ee:set-variable>
-				<ee:set-variable variableName="pageSize" ><![CDATA[%dw 2.0
-import p from Mule
-output application/java
----
-p('app.page.size') as Number]]></ee:set-variable>
-				<ee:set-variable variableName="lastModifiedDate" ><![CDATA[%dw 2.0
+			<ee:set-variable variableName="lastModifiedDate" ><![CDATA[%dw 2.0
 output application/java
 ---
 payload]]></ee:set-variable>
-				<ee:set-variable variableName="totalRecordCount" ><![CDATA[%dw 2.0
+			<ee:set-variable variableName="totalRecordCount" ><![CDATA[%dw 2.0
 output application/java
 ---
 0]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
+		<flow-ref doc:name="sys-object-store-api-get-record-subflow" doc:id="b7a8f8cf-c489-4f0b-9262-03a6f611a9f1" name="sys-object-store-api-get-record-subflow" target="lastSyncDate"/>
 		<flow-ref doc:name="impl-site-to-dimension-paging-subflow" doc:id="7967d5f1-9ad5-4126-8402-308c2b3b8bb6" name="impl-site-to-dimension-paging-subflow"/>
-		<logger level="INFO" doc:name="Log Project to Job Summary" doc:id="e4251ed2-a92a-4ee4-916b-df24a08ec52f" message="Project to Job Summary Result: #[vars.resultSummary] | Sync Date: #[vars.currentSyncDate]" category="${app.log.category}" />
+		<logger level="INFO" doc:name="Log Site to Dimension Summary" doc:id="e4251ed2-a92a-4ee4-916b-df24a08ec52f" message="Site to Dimension Summary Result: #[vars.resultSummary] | Sync Date: #[vars.currentSyncDate]" category="${app.log.category}" />
 		<ee:transform doc:name="Update Last Sync Date" doc:id="1f51a0d7-c9a5-43b6-83f8-5fa17e7c6529">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0
@@ -97,7 +82,7 @@ output application/json
 {
 	"pageEnabled": p('app.page.enabled') as Boolean,
 	"pageNo": vars.pageNo as Number,
-	"pageSize": p('app.page.size') as Number,
+	"pageSize": vars.pageSize as Number,
 	"lastModifiedDate": vars.lastSyncDate
 }]]></ee:set-variable>
 			</ee:variables>

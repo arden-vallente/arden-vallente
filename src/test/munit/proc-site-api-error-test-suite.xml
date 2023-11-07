@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools"
+	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xsi:schemaLocation="
+		http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+		http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+		http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="proc-site-api-error-test-suite.xml" />
+<munit:test
+		name="proc-site-api-connectivity-test-error"
+		doc:id="f86b147d-b8bd-448d-af11-80661dccabed"
+		description="Connectivity Testing" tags="CONNECTIVITY">
+		<munit:behavior>
+			<munit-tools:mock-when
+				doc:name="Mock GET /sys-sitetracker-api/site"
+				doc:id="974c4f1a-d42a-4610-b22f-4fcf87e19865"
+				processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET /sys-sitetracker-api/site" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="060a84fb-1604-4995-990e-9c195603d540" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="FS:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref
+				doc:name="proc-site-api-flow"
+				doc:id="e03aef91-915e-4110-b5d4-c8da05ca45d1"
+				name="proc-site-api-flow" />
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:assert-equals
+				doc:name="httpStatus 503"
+				doc:id="660614d7-d7ac-4999-82dc-24bae6faa4ae"
+				actual="#[vars.httpStatus]" expected="#[503]" />
+		</munit:validation>
+	</munit:test>
+</mule>

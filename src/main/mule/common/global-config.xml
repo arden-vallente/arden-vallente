@@ -23,8 +23,8 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	</http:request-config>
 	<os:config name="ObjectStore_Config" doc:name="ObjectStore Config" doc:id="4c403b45-5a13-433d-ac2b-f77b8267ef36" />
 	<os:object-store name="Object_store" doc:name="Object store" doc:id="38cc614a-d46b-4fa5-81d1-6a68005cba46" entryTtl="${os.entry.ttl}" expirationInterval="${os.entry.expiration.interval}"/>
-	<configuration-properties doc:name="Configuration properties" doc:id="8c8c95c7-f7b4-4019-ac6e-49064243c349" file="config/${mule.env}/config.properties" />
+	<configuration-properties doc:name="Configuration properties" doc:id="8c8c95c7-f7b4-4019-ac6e-49064243c349" file="config/${env}/config.properties" />
 	<configuration-properties doc:name="Configuration properties" doc:id="94261cb3-4e57-4536-a517-bfb8c203e047" file="config/common/common.properties" />
 <!-- 	<import doc:name="Import" doc:id="ac55c74f-cd83-4f73-9813-1e1a68378082" file="forty-south-common-util.xml" /> -->
-	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="106c46cc-521d-4760-b9eb-27251f3ab489" file="config/${mule.env}/secure-config.properties" key="${secure.key}" />
+	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="106c46cc-521d-4760-b9eb-27251f3ab489" file="config/${env}/secure-config.properties" key="${secure.key}" />
 </mule>
