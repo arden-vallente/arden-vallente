@@ -59,11 +59,6 @@
 							<format>console</format>
 							<format>html</format>
 						</formats>
-						<ignoreFlows>
-							<ignoreFlow>sys-sitetracker-api-console</ignoreFlow>
-							<ignoreFlow>retry-error-handler</ignoreFlow>
-							<ignoreFlow>apikit-error-handler</ignoreFlow>
-						</ignoreFlows>
 					</coverage>
 					<runtimeVersion>${app.runtime}</runtimeVersion>
 				</configuration>
