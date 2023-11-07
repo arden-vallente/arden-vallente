@@ -6,7 +6,7 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<sub-flow name="impl-site-to-dimension-sync-subflow" doc:id="adf98f0d-ec0a-47c8-a6af-17a0e9f53c2d" >
-		<logger level="INFO" doc:name="START - GET Site Implem" doc:id="2d4aebab-28fd-4da8-acab-46dc6a9a94c6" category="${app.log.category}" message="START - GET Site Implem"/>
+		<logger level="INFO" doc:name="START - Site Sync Implem" doc:id="2d4aebab-28fd-4da8-acab-46dc6a9a94c6" category="${app.log.category}" message="START -  Site Sync Implem"/>
 		<ee:transform doc:name="Set OS Key, DefaultValue, pageNo, resultSummary" doc:id="c6cecd10-eb2f-44b8-9004-c76eb2c7743a" >
 			<ee:message >
 			</ee:message>
@@ -67,7 +67,7 @@ vars.currentSyncDate]]></ee:set-payload>
 					</ee:message>
 				</ee:transform>
 		<flow-ref doc:name="sys-object-store-api-store-record-subflow" doc:id="1ce7e94e-9cd2-416a-85e1-cc2b0ff127b7" name="sys-object-store-api-store-record-subflow" />
-		<logger level="INFO" doc:name="END - GET Site Implem" doc:id="b5558996-eb16-4f85-9a83-64b488c95c79" message="END - GET Site Implem" category="${app.log.category}"/>
+		<logger level="INFO" doc:name="END - Site Sync Implem" doc:id="b5558996-eb16-4f85-9a83-64b488c95c79" message="END - Site Sync Implem" category="${app.log.category}"/>
 	</sub-flow>
 	<sub-flow name="impl-site-to-dimension-paging-subflow" doc:id="e1545db1-81b1-4393-a3d5-9fc12f91eca4" >
 		<logger level="INFO" doc:name="START - Get Site Impl Paging" doc:id="d7f0dd59-3053-418e-a74b-1c82fcc0e961" message="START - Get Site Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}"/>
