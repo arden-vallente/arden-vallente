@@ -7,15 +7,15 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<sub-flow name="sys-object-store-api-get-record-subflow" doc:id="30a976c8-08ea-4421-a4f4-8c313ac9634d" >
-		<logger level="INFO" doc:name="START - Get Object Store" doc:id="6fe6c7d2-2651-4538-a45a-bddbe2840d00" message="START - Get Object Store Request: #['objectKey']"/>
+		<logger level="INFO" doc:name="START - Get Object Store" doc:id="6fe6c7d2-2651-4538-a45a-bddbe2840d00" message="START - Get Object Store Request: #['objectKey']" category="${app.log.category}"/>
 		<os:retrieve doc:name="Retrieve from Object Store" doc:id="a4ace86f-0cfd-4167-8229-c530f1cc22c0" objectStore="Object_store" key="#[vars.objKey]">
 			<os:default-value ><![CDATA[#[vars.defaultValue]]]></os:default-value>
 		</os:retrieve>
-		<logger level="INFO" doc:name="END - Get Object Store" doc:id="8ea3bd7e-b5a0-4f97-ba21-afbaad240c7b" message="END - Get Object Store Response: #[payload]"/>
+		<logger level="INFO" doc:name="END - Get Object Store" doc:id="8ea3bd7e-b5a0-4f97-ba21-afbaad240c7b" message="END - Get Object Store Response: #[payload]" category="${app.log.category}"/>
 	</sub-flow>
 	<sub-flow name="sys-object-store-api-store-record-subflow" doc:id="9d3b565f-025c-4d7f-b349-f4d0e0675a25" >
-		<logger level="INFO" doc:name="START - Post Object Store" doc:id="6657ecba-fdcf-4ddd-89d9-d418a513ac75" message="START - Post Object Store Request: #[payload], Key: #[vars.objKey]"/>
+		<logger level="INFO" doc:name="START - Post Object Store" doc:id="6657ecba-fdcf-4ddd-89d9-d418a513ac75" message="START - Post Object Store Request: #[payload], Key: #[vars.objKey]" category="${app.log.category}"/>
 		<os:store doc:name="Store to Object Store" doc:id="acc07690-6c1b-48c7-9163-45819291c40c" key="vars.objKey" objectStore="Object_store"/>
-		<logger level="INFO" doc:name="END - Post Object Store" doc:id="0c27621e-fb03-4707-b01c-f2355c176e75" message="END - Post Object Store Response: #[payload]"/>
+		<logger level="INFO" doc:name="END - Post Object Store" doc:id="0c27621e-fb03-4707-b01c-f2355c176e75" message="END - Post Object Store Response: #[payload]" category="${app.log.category}"/>
 	</sub-flow>
 </mule>
