@@ -22,7 +22,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 			</try>
 		</until-successful>
 		<flow-ref doc:name="error-handling-validate-errors" doc:id="fe0bb3fa-fdd0-4943-a1d1-c46c1dce0c30" name="error-handling-validate-errors"/>
-		<logger level="INFO" doc:name="DEBUG - Get Site" doc:id="b302a529-5d74-4069-85a9-41136bd4b26c" message="DEBUG - Get Site Result: #[payload]" category="${app.log.category}" />
+		<logger level="DEBUG" doc:name="DEBUG - Get Site" doc:id="b302a529-5d74-4069-85a9-41136bd4b26c" message="DEBUG - Get Site Result: #[payload]" category="${app.log.category}" />
 		<logger level="INFO" doc:name="END - Get Site" doc:id="44569dc7-c77e-4815-9a95-d02c6baa996d" message="END - Get Site | Site Result Count: #[sizeOf(payload.data)]" category="${app.log.category}"/>
 	</sub-flow>
 </mule>

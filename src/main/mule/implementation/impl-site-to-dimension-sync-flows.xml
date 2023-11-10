@@ -219,7 +219,7 @@ var nextPage = vars.pageNo as Number + 1
 nextPage]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-				<logger level="INFO" doc:name="With next page" doc:id="cb757823-fcbd-42dd-a4ed-a17f7f91a948" message="With next page branch. Next pageNo :  #[vars.pageNo] " category="${app.log.category}" />
+				<logger level="INFO" doc:name="With next page" doc:id="cb757823-fcbd-42dd-a4ed-a17f7f91a948" message="With next page branch. Next pageNo :  #[vars.pageNo]" category="${app.log.category}" />
 				<flow-ref doc:name="impl-site-to-dimension-paging-subflow" doc:id="0e2079bc-9440-48d0-9392-d5f3caf105b5" name="impl-site-to-dimension-paging-subflow" />
 			</when>
 			<otherwise>

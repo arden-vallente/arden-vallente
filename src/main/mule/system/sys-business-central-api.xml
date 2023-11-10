@@ -22,7 +22,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		</try>
 		</until-successful>
 		<flow-ref doc:name="error-handling-validate-errors" doc:id="a4bef771-50d7-4673-b41f-ceb8718a4e2f" name="error-handling-validate-errors" />
-		<logger level="INFO" doc:name="DEBUG - Create Dimension" doc:id="8f1954fe-c57f-478f-9bed-ac370be2ddc6" message="DEBUG - Create Dimension Response: #[payload]" category="${app.log.category}" />
+		<logger level="DEBUG" doc:name="DEBUG - Create Dimension" doc:id="8f1954fe-c57f-478f-9bed-ac370be2ddc6" message="DEBUG - Create Dimension Response: #[payload]" category="${app.log.category}" />
 		<logger level="INFO" doc:name="END - Create Dimension" doc:id="1ddac0b4-5fc4-461b-bc32-2192371363b6" category="${app.log.category}" message="END - Create Dimension | Success | System ID: #[payload.data.systemId]"/>
 	</sub-flow>
 	<sub-flow name="sys-business-central-api-get-dimension-subflow" doc:id="d7d95f39-5432-4d34-8718-6f8c1989e376" >
@@ -44,7 +44,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		</try>
 		</until-successful>
 		<flow-ref doc:name="error-handling-validate-errors" doc:id="d17b7119-f422-4b4e-804a-009c072d5b06" name="error-handling-validate-errors" />
-		<logger level="INFO" doc:name="DEBUG - Get Dimension Result" doc:id="d64a0bc7-4855-4780-878a-9da7673eed14" message="DEBUG - Get Dimension Result : #[payload]" category="${app.log.category}" />
+		<logger level="DEBUG" doc:name="DEBUG - Get Dimension Result" doc:id="d64a0bc7-4855-4780-878a-9da7673eed14" message="DEBUG - Get Dimension Result : #[payload]" category="${app.log.category}" />
 		<logger level="INFO" doc:name="END - Get Dimension" doc:id="73ad7272-0a91-4d34-92fb-443860964e2e" category="${app.log.category}" message="END - Get Dimension | Result Count: #[sizeOf(payload.data)]"/>
 	</sub-flow>
 	<sub-flow name="sys-business-central-api-update-dimension-subflow" doc:id="a7adf576-e63a-4926-a731-aae0e2ec0ab2" >
@@ -66,7 +66,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		</try>
 		</until-successful>
 		<flow-ref doc:name="error-handling-validate-errors" doc:id="7b2377f5-7f9c-429a-af00-5f92825ead6c" name="error-handling-validate-errors" />
-		<logger level="INFO" doc:name="DEBUG - Update Dimension" doc:id="f5ee808e-19c9-4053-a855-91f4d7e81a99" message="DEBUG - Update Dimension Response: #[payload]" category="${app.log.category}" />
+		<logger level="DEBUG" doc:name="DEBUG - Update Dimension" doc:id="f5ee808e-19c9-4053-a855-91f4d7e81a99" message="DEBUG - Update Dimension Response: #[payload]" category="${app.log.category}" />
 		<logger level="INFO" doc:name="END - Update Dimension" doc:id="b6fd46e4-b008-47ea-990f-220fa0196d25" message="END - Update Dimension | Success | System ID: #[vars.uriParams]" category="${app.log.category}" />
 	</sub-flow>
 </mule>
