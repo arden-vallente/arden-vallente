@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:munit-tools="http://www.mulesoft.org/schema/mule/munit-tools" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="   http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd   http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd   http://www.mulesoft.org/schema/mule/munit-tools  http://www.mulesoft.org/schema/mule/munit-tools/current/mule-munit-tools.xsd">
+	<munit:config name="proc-site-api-test-suite.xml"/>
+	<munit:test description="Updating a dimension from site" doc:id="b2655394-6a68-4f81-9d0e-9f043b9a7e0a" name="proc-site-api-success-update-test" tags="UPDATE DIMENSION">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="0d62338a-957e-41e9-b01c-febf9a789562" doc:name="Mock GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/get-site-response.json')]"/>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="59134b5f-5d28-40ec-b962-fa2a74122555" doc:name="Mock GET /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-business-central-api/dimension"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/get-bc-response.json')]"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="971417af-5111-48de-b48c-06adc0e30a3f" doc:name="Mock PATCH /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PATCH /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b325774a-b253-4927-8530-e546fdb24066" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/patch-bc-response.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:id="bd74eb34-f0e8-43c4-a1ef-500de1f7b664" doc:name="Spy PATCH /sys-business-central-api/dimension" processor="flow-ref">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="sys-business-central-api-update-dimension-subflow" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="77325261-534f-4d84-a1f3-234a16187910" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call>
+					<munit-tools:assert doc:name="Assert expression" doc:id="b0e024bb-d9d3-499d-a509-d3dbf804fdc7" />
+				</munit-tools:before-call>
+			</munit-tools:spy>
+			<munit-tools:mock-when doc:name="Mock Store to Object Store" doc:id="99deb704-3031-4da1-9319-502738897fa4" processor="os:store" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Store to Object Store" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="acc07690-6c1b-48c7-9163-45819291c40c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[""]' mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:id="9847603a-f83c-46e1-86b8-c5724fa948f8" doc:name="Flow-ref to proc-site-api-flow" name="proc-site-api-flow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call atLeast="1" doc:id="55aa6627-5947-4fa0-a63e-1df842cabc4e" doc:name="Verify call GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call atLeast="1" doc:id="a530598b-a7ad-4359-b1ed-c7d30d58c639" doc:name="Verify call GET /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-business-central-api/dimension"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722"/>
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call atLeast="1" doc:id="27943828-c963-4e34-88ab-1c89e9448ac6" doc:name="Verify call PATCH /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="PATCH /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b325774a-b253-4927-8530-e546fdb24066" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Creating a dimension from site" doc:id="53939934-a8d5-4d00-94e8-787d155847d5" name="proc-site-api-success-create-test" tags="CREATE DIMENSION">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="0a2892eb-9e2c-438e-8a70-1af4f8d170d6" doc:name="Mock GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/get-site-response.json')]"/>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="da769983-a922-402c-a060-121367da3d1a" doc:name="Mock GET /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-business-central-api/dimension"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/get-bc-response-empty.json')]"/>
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:spy doc:id="86e8cdb5-5440-4cb5-b2ad-9a13aeb53e27" doc:name="Spy POST /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b86aa948-a183-4495-aeb4-1a5a8da2c128" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:before-call>
+					<munit-tools:assert-equals actual="#[payload]" doc:id="749c2f6b-3a54-452b-9391-805ca8de7d01" doc:name="Assert equals" expected="#[readUrl('classpath://sample_data/post-bc-request.json', &quot;application/json&quot;)]"/>
+				</munit-tools:before-call>
+			</munit-tools:spy>
+			<munit-tools:mock-when doc:id="fabb0313-3788-41f4-9f83-378abb944573" doc:name="Mock POST /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b86aa948-a183-4495-aeb4-1a5a8da2c128" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/post-bc-response.json')]" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:id="ee9fd546-87d6-4490-bbe5-a16bc9492777" doc:name="Flow-ref to proc-site-api-flow" name="proc-site-api-flow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call atLeast="1" doc:id="6dbae786-0fe1-4e4c-ae89-9a02cc832b6f" doc:name="Verify call GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call atLeast="1" doc:id="9258b674-9bf6-42f6-8283-675306917794" doc:name="Verify call GET /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-business-central-api/dimension"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722"/>
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call atLeast="1" doc:id="4bff4d6d-e7f1-4d1a-b56c-07b41c9e2fe3" doc:name="Verify call POST /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b86aa948-a183-4495-aeb4-1a5a8da2c128" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Checking if Site has data" doc:id="d7100771-0589-4491-9ec1-ead7cc49d413" name="proc-site-api-no-activity-test" tags="CREATE DIMENSION">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="34851e15-d775-4059-b6fd-eef711de1ec2" doc:name="Mock GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/get-site-empty-response.json')]"/>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:id="fba1763d-4905-4976-a348-440922098903" doc:name="Flow-ref to proc-site-api-flow" name="proc-site-api-flow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call atLeast="1" doc:id="18c7ef63-e388-4ff9-a6f1-d1bc2f316014" doc:name="Verify call GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="proc-site-api-test-failed-connectivity-error-test" doc:id="63e3f76b-e106-4d03-8d2c-12903d10ce77" description="Failed Connectivity Issue" tags="CONNECTIVITY ISSUE">
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock GET /sys-sitetracker-api/site" doc:id="51165c06-48cc-47ec-a1d3-42344b245a67" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET /sys-sitetracker-api/site" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="060a84fb-1604-4995-990e-9c195603d540" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/get-site-response-error.json')]" mediaType="application/json" encoding="UTF-8" />
+					<munit-tools:error typeId="HTTP:TIMEOUT" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Store to Object Store" doc:id="bd4822f4-48d7-4a2b-b45e-2ddfab916d4a" processor="os:store" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Store to Object Store" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="acc07690-6c1b-48c7-9163-45819291c40c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[""]' mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to proc-site-api-flow" doc:id="127537e8-5fe7-4fec-917d-e16ba405bf71" name="proc-site-api-flow" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call GET /sys-sitetracker-api/site" doc:id="23f7f8b1-b578-4d3b-b3ad-a3e06a8c0efb" processor="http:request" atLeast="3" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET /sys-sitetracker-api/site" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="060a84fb-1604-4995-990e-9c195603d540" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify Log System Connectivity ERROR" doc:id="1bc0e33d-4bbb-4752-97db-87750b5c0627" processor="logger" atLeast="3">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Log System Connectivity ERROR" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="94c49042-9c86-47e7-8122-55886a3b2db9" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test description="Connectivity Testing" doc:id="a827100a-0d0f-4bd1-bb84-abb05ceb1ef0" name="proc-site-api-error-process-record" tags="CONNECTIVITY">
+		<munit:behavior>
+			<munit-tools:mock-when doc:id="d16e6bf4-1c77-4211-ba0d-58508150d96d" doc:name="Mock GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return>
+					<munit-tools:payload encoding="UTF-8" mediaType="application/json" value="#[MunitTools::getResourceAsString('sample_data/get-site-response.json')]"/>
+				</munit-tools:then-return>
+			
+</munit-tools:mock-when>
+			<munit-tools:mock-when doc:id="84ed6b06-2556-4925-85d0-163804e24b2b" doc:name="Mock GET /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-business-central-api/dimension"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722"/>
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:CONNECTIVITY" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution>
+			<flow-ref doc:id="7b378446-becd-409d-a9a1-7ed01e5b017f" doc:name="proc-site-api-flow" name="proc-site-api-flow"/>
+		</munit:execution>
+		<munit:validation>
+			<munit-tools:verify-call atLeast="1" doc:id="b27e3303-a757-4e78-8acf-fa46760cd3f8" doc:name="Verify call GET /sys-sitetracker-api/site" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-sitetracker-api/site"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="060a84fb-1604-4995-990e-9c195603d540"/>
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call atLeast="1" doc:id="4ad86ba7-95b4-44bf-976f-b4fce9a807af" doc:name="Verify call GET /sys-business-central-api/dimension" processor="http:request">
+				<munit-tools:with-attributes>
+					<munit-tools:with-attribute attributeName="doc:name" whereValue="GET /sys-business-central-api/dimension"/>
+					<munit-tools:with-attribute attributeName="doc:id" whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722"/>
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+	<munit:test name="proc-site-api-test-failed-create-dimension-test" doc:id="34edeffa-7ed0-4dd5-9bd5-81ac3070c984" description="Failed Create Dimension" tags="FAILED TO CREATE DIMENSION" >
+		<munit:behavior >
+			<munit-tools:mock-when doc:name="Mock GET /sys-sitetracker-api/site" doc:id="c2ca9a8f-b5a0-44a8-b432-3eaaf11a0685" processor="http:request" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET /sys-sitetracker-api/site" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="060a84fb-1604-4995-990e-9c195603d540" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/get-site-response.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock GET /sys-business-central-api/dimension" doc:id="66b0896a-47b6-485f-bdac-5e3792f26494" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value="#[MunitTools::getResourceAsString('sample_data/get-bc-response-empty.json')]" mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock POST /sys-business-central-api/dimension" doc:id="f6564c62-0fbd-4514-93f1-bd7eecf2b25a" processor="http:request">
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="POST /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b86aa948-a183-4495-aeb4-1a5a8da2c128" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:error typeId="HTTP:BAD_REQUEST" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+			<munit-tools:mock-when doc:name="Mock Store to Object Store" doc:id="fb5e88f0-ea01-48b9-b28d-48ee856b24b3" processor="os:store" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="Store to Object Store" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="acc07690-6c1b-48c7-9163-45819291c40c" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+				<munit-tools:then-return >
+					<munit-tools:payload value='#[""]' mediaType="application/json" encoding="UTF-8" />
+				</munit-tools:then-return>
+			</munit-tools:mock-when>
+		</munit:behavior>
+		<munit:execution >
+			<flow-ref doc:name="Flow-ref to proc-site-api-flow" doc:id="653afb30-4196-449c-8342-3bebd53cad32" name="proc-site-api-flow" />
+		</munit:execution>
+		<munit:validation >
+			<munit-tools:verify-call doc:name="Verify call GET /sys-sitetracker-api/site" doc:id="d99d8a42-4180-47a8-a515-d1fa7216b8dc" processor="http:request" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET /sys-sitetracker-api/site" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="060a84fb-1604-4995-990e-9c195603d540" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call GET /sys-business-central-api/dimension" doc:id="cb79a6fa-21a7-4c43-aecb-3d37b5eeef1a" processor="http:request" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="GET /sys-business-central-api/dimension" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="b48635ed-9687-46d9-9dcf-14f9792fa722" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+			<munit-tools:verify-call doc:name="Verify call ERROR - Process ATS Record" doc:id="b6e93222-248a-4d8c-afcd-8e0a0a03fcac" processor="logger" atLeast="1" >
+				<munit-tools:with-attributes >
+					<munit-tools:with-attribute whereValue="ERROR - Process Site Record" attributeName="doc:name" />
+					<munit-tools:with-attribute whereValue="e7227844-0773-4ddb-b120-6355a2c9896f" attributeName="doc:id" />
+				</munit-tools:with-attributes>
+			</munit-tools:verify-call>
+		</munit:validation>
+	</munit:test>
+</mule>

@@ -5,49 +5,25 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
-	<error-handler name="default-error-handler" doc:id="5f2e89a8-ff58-444f-8ece-fca8f36fc175" >
-		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="b9b4e45e-3232-4cb6-a04e-0108b0910cc7" type="ANY">
-			<ee:transform doc:name="Set Payload, Set Variable httpStatus and outboundHeader" doc:id="5a6d18c2-507b-4641-8fd0-028796883799">
-				<ee:message>
-					<ee:set-payload resource="dwl/response/dwl-default-response.dwl" />
-				</ee:message>
-				<ee:variables>
-					<ee:set-variable variableName="httpStatus"><![CDATA[output application/java
-
-var err = if(!isEmpty(payload) and typeOf(payload) == Object and !isEmpty(payload.error)) payload.error else error default error
----
-if (!isEmpty(err.errorType) and !isEmpty(Mule::p('errors.' ++ lower(err.errorType.identifier) ++ '.code')))
-	Mule::p('errors.' ++ lower(err.errorType.identifier) ++ '.code') as Number
-else if (!isEmpty(err.muleMessage)) err.muleMessage.typedAttribute.statusCode as Number
-else Mule::p('errors.default.code') as Number
-]]></ee:set-variable>
-					<ee:set-variable variableName="outboundHeaders"><![CDATA[%dw 2.0
-output application/json
-
-var err = if(!isEmpty(payload) and typeOf(payload) == Object and !isEmpty(payload.error)) payload.error else error default error
----
-{
-	"x-event-id": correlationId,
-	"x-event-msg":  if ( !isEmpty(err.errorType) and !isEmpty(Mule::p('errors.' ++ lower(err.errorType.identifier) ++ '.description')) ) Mule::p('errors.' ++ lower(err.errorType.identifier) ++ '.description')
-					else if ( !isEmpty(err.muleMessage) ) err.muleMessage.typedAttribute.reasonPhrase
-					else Mule::p('errors.default.description'),
-	"x-event-code": if ( !isEmpty(err.errorType) and !isEmpty(Mule::p('errors.' ++ lower(err.errorType.identifier) ++ '.code')) ) Mule::p('errors.' ++ lower(err.errorType.identifier) ++ '.code') as Number
-					else if ( !isEmpty(err.muleMessage) ) err.muleMessage.typedAttribute.statusCode as Number
-					else Mule::p('errors.default.code') as Number
-}]]></ee:set-variable>
-				
-</ee:variables>
-			</ee:transform>
-			<logger level="ERROR" doc:name="Error Response, httpStatus based on the error" doc:id="5f53fc68-58bd-4d17-b1e1-3c2532c99e44" message="#[%dw 2.0&#10;import * from dwl::scripts::LogUtil&#10;output application/json&#10;&#10;var logObj = {&#10;	&quot;correlationId&quot;: correlationId,&#10;	&quot;applicationName&quot;: app.name,&#10;	&quot;applicationVersion&quot;: Mule::p('app.version'),&#10;	&quot;environment&quot;: Mule::p('mule.env'), &#10;	&quot;flowName&quot;: &quot;default-error-handler&quot;,&#10;	&quot;category&quot;: &quot;error.&quot; ++ lower(error.errorType.identifier), &#10;	&quot;tracePoint&quot;: &quot;ERROR&quot;, &#10;	&quot;message&quot;: &quot;An error was encountered&quot;,&#10;	&quot;error&quot;: if(!isEmpty(payload) and typeOf(payload) == Object and !isEmpty(payload.error)) payload.error else error default error&#10;}&#10;---&#10;logError(logObj)]" />
+	<error-handler name="system-error-handler" doc:id="97062a37-bbd2-41b9-9e2a-652f86a56950" >
+		<on-error-propagate enableNotifications="true" logException="false" doc:name="On Error Propagate" doc:id="47a10fce-ab61-4928-a945-ade90b4fbd2c" type="HTTP:CONNECTIVITY, HTTP:SECURITY, HTTP:TIMEOUT">
+			<logger level="ERROR" doc:name="Log System Connectivity ERROR" doc:id="94c49042-9c86-47e7-8122-55886a3b2db9" message="ERROR - CONNECTIVITY: #[error.description] | #[error.errorMessage.payload]" category="${app.log.category.error}" />
+		</on-error-propagate>
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="4d9c7df0-4b27-4341-a8ee-989c74ea6633" type="ANY" >
+			<logger level="ERROR" doc:name="Log System Other ERROR" doc:id="76984e71-cf6e-4396-b2ca-1dc8b1997212" message="ERROR - Exception: #[error.description] | #[error.errorMessage.payload]" category="${app.log.category.error}" />
+			<set-variable value="#[true]" doc:name="Set hasError" doc:id="e1670ac4-d111-4c9c-8781-fa4e9f34dd18" variableName="hasError"/>
 		</on-error-continue>
-	
-
-</error-handler>
-	
-	<error-handler name="system-error-handler" doc:id="b0654aad-060f-4a78-b9d6-bbcb22b0086e">
-		<on-error-continue enableNotifications="true" logException="false" doc:name="On Error Continue" doc:id="440aea82-f1cc-4461-b081-6245e9c404d0" type="HTTP:CONNECTIVITY, HTTP:SECURITY, HTTP:TIMEOUT">
-			<logger level="ERROR" doc:name="Log System ERROR" doc:id="586574ae-e8c5-4429-9503-59707e9a07a7" message="ERROR - Exception: #[attributes.error.description]" category="${app.log.category.error}"/>
-		
-</on-error-continue>
-	</error-handler>	
+	</error-handler>
+	<error-handler name="default-error-handler" doc:id="ea1d628c-7516-4ba0-b07d-acb7ecca68a3" >
+		<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="ebac653e-f687-41a1-8f59-1d42b4a374a3" type="ANY">
+			<logger level="ERROR" doc:name="Error Response, httpStatus based on the error" doc:id="a9d63c37-a89d-4dbb-961a-e0ee5b6bdf7b" message="ERROR - Default Exception: #[error.description] | #[error.errorMessage.payload]" category="${app.log.category.error}"/>
+		</on-error-continue>
+	</error-handler>
+	<sub-flow name="error-handling-validate-errors" doc:id="1905415c-1276-41a3-bb8b-72e001be4de4" >
+		<choice doc:name="if hasError?" doc:id="ec664ee7-3737-43bf-9d7d-f35ea2db54d1" >
+			<when expression="#[(!isEmpty(vars.hasError))]">
+				<raise-error doc:name="Raise System error" doc:id="96157928-bd7c-40d3-b907-93c90f3ceb84" type="FS:SYSTEM_ERROR"/>
+			</when>
+		</choice>
+	</sub-flow>
 	</mule>
