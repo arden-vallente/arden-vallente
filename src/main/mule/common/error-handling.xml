@@ -21,7 +21,7 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 	</error-handler>
 	<sub-flow name="error-handling-validate-errors" doc:id="1905415c-1276-41a3-bb8b-72e001be4de4" >
 		<choice doc:name="if hasError?" doc:id="ec664ee7-3737-43bf-9d7d-f35ea2db54d1" >
-			<when expression="#[(!isEmpty(vars.hasError))]">
+			<when expression="#[(!isEmpty(vars.hasError) and vars.hasError)]">
 				<raise-error doc:name="Raise System error" doc:id="96157928-bd7c-40d3-b907-93c90f3ceb84" type="FS:SYSTEM_ERROR"/>
 			</when>
 		</choice>

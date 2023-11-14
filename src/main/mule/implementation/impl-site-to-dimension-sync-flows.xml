@@ -161,7 +161,7 @@ var summary = vars.resultSummary
 				</ee:transform>
 						<error-handler >
 							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="60a70564-6ccf-425a-8514-a28bf97d65b6" >
-								<logger level="ERROR" doc:name="ERROR - Process Site Record" doc:id="e7227844-0773-4ddb-b120-6355a2c9896f" message="ERROR - Process Site Record Exception: #[error.description] | #[error.errorMessage.payload]" category="${app.log.category.error}"/>
+								<logger level="ERROR" doc:name="ERROR - Process Site Record" doc:id="e7227844-0773-4ddb-b120-6355a2c9896f" message="ERROR - Process Site Record - pageNo: #[vars.pageNo] recordNo: #[vars.counter -1] Exception: #[error.description] | #[error.errorMessage.payload]" category="${app.log.category.error}"/>
 								<ee:transform doc:name="Update Result Summary" doc:id="91ae638b-62eb-4e79-a80e-ec25b12310b2" >
 									<ee:message >
 									</ee:message>
@@ -175,6 +175,10 @@ var summary = vars.resultSummary
 	failed: ((summary.failed default 0) + 1),
 	emptySiteCode: summary.emptySiteCode 
 }]]></ee:set-variable>
+												<ee:set-variable variableName="hasError" ><![CDATA[%dw 2.0
+output application/java
+---
+false]]></ee:set-variable>
 									</ee:variables>
 								</ee:transform>
 							</on-error-continue>

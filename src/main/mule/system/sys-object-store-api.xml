@@ -7,7 +7,7 @@
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
 	<sub-flow name="sys-object-store-api-get-record-subflow" doc:id="30a976c8-08ea-4421-a4f4-8c313ac9634d" >
-		<logger level="INFO" doc:name="START - Get Object Store" doc:id="6fe6c7d2-2651-4538-a45a-bddbe2840d00" message="START - Get Object Store Request: #['objectKey']" category="${app.log.category}"/>
+		<logger level="INFO" doc:name="START - Get Object Store" doc:id="6fe6c7d2-2651-4538-a45a-bddbe2840d00" message="START - Get Object Store Request - Key: #[vars.objKey]" category="${app.log.category}"/>
 		<os:retrieve doc:name="Retrieve from Object Store" doc:id="a4ace86f-0cfd-4167-8229-c530f1cc22c0" objectStore="Object_store" key="#[vars.objKey]">
 			<os:default-value ><![CDATA[#[vars.defaultValue]]]></os:default-value>
 		</os:retrieve>
