@@ -15,7 +15,7 @@ http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/cu
 	</sub-flow>
 	<sub-flow name="sys-object-store-api-store-record-subflow" doc:id="9d3b565f-025c-4d7f-b349-f4d0e0675a25" >
 		<logger level="INFO" doc:name="START - Post Object Store" doc:id="6657ecba-fdcf-4ddd-89d9-d418a513ac75" message="START - Post Object Store Request: #[payload], Key: #[vars.objKey]" category="${app.log.category}"/>
-		<os:store doc:name="Store to Object Store" doc:id="acc07690-6c1b-48c7-9163-45819291c40c" key="vars.objKey" objectStore="Object_store"/>
+		<os:store doc:name="Store to Object Store" doc:id="acc07690-6c1b-48c7-9163-45819291c40c" key="#[vars.objKey]" objectStore="Object_store"/>
 		<logger level="INFO" doc:name="END - Post Object Store" doc:id="0c27621e-fb03-4707-b01c-f2355c176e75" message="END - Post Object Store Response: #[payload]" category="${app.log.category}"/>
 	</sub-flow>
 </mule>

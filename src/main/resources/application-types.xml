@@ -163,4 +163,5 @@ type auto_30a976c8_08ea_4421_a4f4_8c313ac9634d_Output_Attributes = Null
       </types:output-event>
     </types:processor-declaration>
   </types:enrichment>
+  <types:enrichment select="#c6cecd10-eb2f-44b8-9004-c76eb2c7743a"/>
 </types:mule>
