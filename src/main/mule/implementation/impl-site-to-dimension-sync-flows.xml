@@ -43,7 +43,7 @@ output application/java
 output application/java
 ---
 now() as String {
-	format : "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+	format : "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'"
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
