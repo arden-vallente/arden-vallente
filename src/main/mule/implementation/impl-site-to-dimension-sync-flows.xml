@@ -94,30 +94,82 @@ totalRecords]]></ee:set-variable>
 		<choice doc:name="Site Record Found?" doc:id="fbaec6b3-4db4-4c7d-aa68-9d6e2d7bcb94" >
 			<when expression="#[sizeOf(vars.site.data) &gt; 0]">
 				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" collection="#[vars.site.data]">
-					<choice doc:name="SiteCode is not empty?" doc:id="e17ada41-5082-49af-bf1f-82088b90bb91" >
-						<when expression="#[!isEmpty(payload.siteCode)]">
-						<try doc:name="Try" doc:id="f64ab517-7caa-42a1-8494-8d572974998c" >
+					<ee:transform doc:name="Set siteCode, sarfCode" doc:id="fc343f0a-9b50-437a-ae31-03e28f8f92fa" >
+						<ee:message >
+						</ee:message>
+						<ee:variables >
+							<ee:set-variable variableName="siteCode" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.siteCode default ""]]></ee:set-variable>
+							<ee:set-variable variableName="sarfCode" ><![CDATA[%dw 2.0
+output application/java
+---
+payload.sarfCode default ""]]></ee:set-variable>
+						</ee:variables>
+					</ee:transform>
+					<choice doc:name="siteCode and sarfCode exists?" doc:id="e17ada41-5082-49af-bf1f-82088b90bb91" >
+						<when expression="#[isEmpty(vars.siteCode) and isEmpty(vars.sarfCode)]">
+							<logger level="INFO" doc:name="No Site Code or SARF Code Found" doc:id="be1bbe6a-aa41-449b-80d7-de316b7530f1" message='#[output application/json&#10;---&#10;"No Site Code or SARF Code Found - $(payload.id)"]' category="${app.log.category}" />
+							<ee:transform doc:name="Update Result Summary" doc:id="d7fd11f4-9522-4bc2-9557-fa08d3e59108">
+								<ee:message />
+								<ee:variables>
+									<ee:set-variable variableName="resultSummary"><![CDATA[%dw 2.0
+output application/java
+var summary = vars.resultSummary
+---
+{
+	success: summary.success,
+	failed: summary.failed,
+	emptySiteCode: ((summary.emptySiteCode default 0) + 1)
+}]]></ee:set-variable>
+								</ee:variables>
+							</ee:transform>
+						</when>
+						<otherwise >
+							<try doc:name="Try" doc:id="f64ab517-7caa-42a1-8494-8d572974998c">
 						<ee:transform doc:name="Set bcQueryParams" doc:id="1648964e-0779-41b2-a449-3bd6c1d034fc">
 						<ee:message>
 						</ee:message>
 							<ee:variables>
 								<ee:set-variable variableName="bcQueryParams"><![CDATA[%dw 2.0
 output application/json
+
+var filters = {
+    "siteCodeFilter": if (!isEmpty(vars.siteCode)) "code eq '$(vars.siteCode)' " else "",
+    "sarfCodeFilter": if (!isEmpty(vars.sarfCode)) "code eq '$(vars.sarfCode)' " else ""
+}
 ---
 {
-	filter: "code eq '$(payload.siteCode)'"
+	filter: (valuesOf(filters) filter !isBlank($)) joinBy " or "
 }]]></ee:set-variable>
 							</ee:variables>
 					</ee:transform>
-						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="2ba18ceb-9eb2-4217-8dc0-06a3f22f4ecf" name="sys-business-central-api-get-dimension-subflow" target="dimension"/>
-						<choice doc:name="Dimension Already Exist?" doc:id="744f4d4b-2ecc-4183-9f29-9c3caf61a032" >
+						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="2ba18ceb-9eb2-4217-8dc0-06a3f22f4ecf" name="sys-business-central-api-get-dimension-subflow" target="dimension" />
+						<ee:transform doc:name="Check Routing" doc:id="bd0f2690-8ea0-45fc-b8bc-1ca0bb3105d0" >
+									<ee:message >
+									</ee:message>
+									<ee:variables >
+										<ee:set-variable variableName="route" ><![CDATA[%dw 2.0
+output application/json
+
+var siteCodeExist = vars.dimension.data.code contains vars.siteCode
+var sarfCodeExist = vars.dimension.data.code contains vars.sarfCode
+---
+if (!isEmpty(vars.siteCode) and !isEmpty(vars.sarfCode) and !siteCodeExist and sarfCodeExist) "RENAME" else "REGULAR"]]></ee:set-variable>
+									</ee:variables>
+								</ee:transform>
+								<choice doc:name="Invoke Rename API?" doc:id="2f087c17-5e25-4336-ae68-f6ed0935278c" >
+									<when expression="#[vars.route == 'RENAME']"/>
+									<otherwise >
+										<choice doc:name="Dimension Already Exist?" doc:id="744f4d4b-2ecc-4183-9f29-9c3caf61a032">
 							<when expression="#[sizeOf(vars.dimension.data) &gt; 0]">
 								<ee:transform doc:name="Set Update Dimension Payload" doc:id="f99bada9-a9a6-450e-bb6e-9e1cffae13bb">
 			<ee:message>
 										<ee:set-payload resource="dwl/request/dwl-update-dimension-request.dwl" />
 			</ee:message>
-									<ee:variables >
-										<ee:set-variable variableName="uriParams" ><![CDATA[%dw 2.0
+									<ee:variables>
+										<ee:set-variable variableName="uriParams"><![CDATA[%dw 2.0
 output application/java
 var dimension = vars.dimension.data
 ---
@@ -128,15 +180,17 @@ var dimension = vars.dimension.data
 		</ee:transform>
 								<flow-ref doc:name="sys-business-central-api-update-dimension-subflow" doc:id="77325261-534f-4d84-a1f3-234a16187910" name="sys-business-central-api-update-dimension-subflow" />
 							</when>
-							<otherwise >
-								<ee:transform doc:name="Set Create Dimension Payload" doc:id="d6e224ff-0207-4b89-b0e0-e28c68fc4e07" >
-									<ee:message >
+							<otherwise>
+								<ee:transform doc:name="Set Create Dimension Payload" doc:id="d6e224ff-0207-4b89-b0e0-e28c68fc4e07">
+									<ee:message>
 										<ee:set-payload resource="dwl/request/dwl-create-dimension-request.dwl" />
 									</ee:message>
 								</ee:transform>
 								<flow-ref doc:name="sys-business-central-api-create-dimension-subflow" doc:id="4fd23077-52ab-42db-a0ec-eb4d9b36adf4" name="sys-business-central-api-create-dimension-subflow" />
 							</otherwise>
 						</choice>
+									</otherwise>
+								</choice>
 						<ee:transform doc:name="Update Result Summary" doc:id="a3c28160-4728-46e9-8b44-0a45f759499c">
 					<ee:message />
 					<ee:variables>
@@ -151,14 +205,14 @@ var summary = vars.resultSummary
 }]]></ee:set-variable>
 					</ee:variables>
 				</ee:transform>
-						<error-handler >
-							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="60a70564-6ccf-425a-8514-a28bf97d65b6" >
-								<logger level="ERROR" doc:name="ERROR - Process Site Record" doc:id="e7227844-0773-4ddb-b120-6355a2c9896f" message="ERROR - Process Site Record - pageNo: #[vars.pageNo] recordNo: #[vars.counter -1] Exception: #[error.description] | #[error.errorMessage.payload]" category="${app.log.category.error}"/>
-								<ee:transform doc:name="Update Result Summary" doc:id="91ae638b-62eb-4e79-a80e-ec25b12310b2" >
-									<ee:message >
+						<error-handler>
+							<on-error-continue enableNotifications="true" logException="true" doc:name="On Error Continue" doc:id="60a70564-6ccf-425a-8514-a28bf97d65b6">
+								<logger level="ERROR" doc:name="ERROR - Process Site Record" doc:id="e7227844-0773-4ddb-b120-6355a2c9896f" message="ERROR - Process Site Record - pageNo: #[vars.pageNo] recordNo: #[vars.counter -1] Exception: #[error.description] | #[error.errorMessage.payload]" category="${app.log.category.error}" />
+								<ee:transform doc:name="Update Result Summary" doc:id="91ae638b-62eb-4e79-a80e-ec25b12310b2">
+									<ee:message>
 									</ee:message>
-									<ee:variables >
-										<ee:set-variable variableName="resultSummary" ><![CDATA[%dw 2.0
+									<ee:variables>
+										<ee:set-variable variableName="resultSummary"><![CDATA[%dw 2.0
 output application/java
 var summary = vars.resultSummary
 ---
@@ -167,7 +221,7 @@ var summary = vars.resultSummary
 	failed: ((summary.failed default 0) + 1),
 	emptySiteCode: summary.emptySiteCode 
 }]]></ee:set-variable>
-												<ee:set-variable variableName="hasError" ><![CDATA[%dw 2.0
+												<ee:set-variable variableName="hasError"><![CDATA[%dw 2.0
 output application/java
 ---
 false]]></ee:set-variable>
@@ -176,23 +230,6 @@ false]]></ee:set-variable>
 							</on-error-continue>
 						</error-handler>
 					</try>
-						</when>
-						<otherwise >
-							<logger level="INFO" doc:name="No Site Code Found" doc:id="be1bbe6a-aa41-449b-80d7-de316b7530f1" message='#[output application/json&#10;---&#10;"No Site Code Found - $(payload.id)"]' category="${app.log.category}"/>
-							<ee:transform doc:name="Update Result Summary" doc:id="d7fd11f4-9522-4bc2-9557-fa08d3e59108" >
-								<ee:message />
-								<ee:variables >
-									<ee:set-variable variableName="resultSummary" ><![CDATA[%dw 2.0
-output application/java
-var summary = vars.resultSummary
----
-{
-	success: summary.success,
-	failed: summary.failed,
-	emptySiteCode: ((summary.emptySiteCode default 0) + 1)
-}]]></ee:set-variable>
-								</ee:variables>
-							</ee:transform>
 						</otherwise>
 					</choice>
 					
