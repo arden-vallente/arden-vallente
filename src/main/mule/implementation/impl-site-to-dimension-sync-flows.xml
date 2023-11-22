@@ -61,13 +61,13 @@ vars.currentSyncDate]]></ee:set-payload>
 		<flow-ref doc:name="sys-object-store-api-store-record-subflow" doc:id="1ce7e94e-9cd2-416a-85e1-cc2b0ff127b7" name="sys-object-store-api-store-record-subflow" />
 		<logger level="INFO" doc:name="END - Site Sync Implem" doc:id="b5558996-eb16-4f85-9a83-64b488c95c79" message="END - Site Sync Implem" category="${app.log.category}"/>
 	</sub-flow>
-	<sub-flow name="impl-site-to-dimension-paging-subflow" doc:id="e1545db1-81b1-4393-a3d5-9fc12f91eca4" >
-		<logger level="INFO" doc:name="START - Get Site Impl Paging" doc:id="d7f0dd59-3053-418e-a74b-1c82fcc0e961" message="START - Get Site Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}"/>
-		<ee:transform doc:name="Set queryParams" doc:id="c2754586-0236-4ddb-8754-26147277fcb5" >
-			<ee:message >
+	<sub-flow name="impl-site-to-dimension-paging-subflow" doc:id="e1545db1-81b1-4393-a3d5-9fc12f91eca4">
+		<logger level="INFO" doc:name="START - Get Site Impl Paging" doc:id="d7f0dd59-3053-418e-a74b-1c82fcc0e961" message="START - Get Site Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}" />
+		<ee:transform doc:name="Set queryParams" doc:id="c2754586-0236-4ddb-8754-26147277fcb5">
+			<ee:message>
 			</ee:message>
-			<ee:variables >
-				<ee:set-variable variableName="queryParams" ><![CDATA[%dw 2.0
+			<ee:variables>
+				<ee:set-variable variableName="queryParams"><![CDATA[%dw 2.0
 import p from Mule
 output application/json
 ---
@@ -79,36 +79,36 @@ output application/json
 }]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<flow-ref doc:name="sys-sitetracker-api-get-site-flow" doc:id="fd78790e-5198-4481-ae89-8614dc4c609e" name="sys-sitetracker-api-get-site-subflow" target="site"/>
+		<flow-ref doc:name="sys-sitetracker-api-get-site-flow" doc:id="fd78790e-5198-4481-ae89-8614dc4c609e" name="sys-sitetracker-api-get-site-subflow" target="site" />
 		<ee:transform doc:name="Set retrieveRecodCount" doc:id="ef697910-6c2b-479c-be68-de79916bc9c2">
 			<ee:message>
 			</ee:message>
 			<ee:variables>
-				<ee:set-variable variableName="retrieveRecordCount" ><![CDATA[%dw 2.0
+				<ee:set-variable variableName="retrieveRecordCount"><![CDATA[%dw 2.0
 output application/java
 var totalRecords = vars.retrieveRecordCount + sizeOf(vars.site.data)
 ---
 totalRecords]]></ee:set-variable>
 			</ee:variables>
 		</ee:transform>
-		<choice doc:name="Site Record Found?" doc:id="fbaec6b3-4db4-4c7d-aa68-9d6e2d7bcb94" >
+		<choice doc:name="Site Record Found?" doc:id="fbaec6b3-4db4-4c7d-aa68-9d6e2d7bcb94">
 			<when expression="#[sizeOf(vars.site.data) &gt; 0]">
 				<foreach doc:name="For Each Site Record" doc:id="0c8f8338-e421-451e-8776-9558575b3ca0" collection="#[vars.site.data]">
-					<ee:transform doc:name="Set siteCode, sarfCode" doc:id="fc343f0a-9b50-437a-ae31-03e28f8f92fa" >
-						<ee:message >
+					<ee:transform doc:name="Set siteCode, sarfCode" doc:id="fc343f0a-9b50-437a-ae31-03e28f8f92fa">
+						<ee:message>
 						</ee:message>
-						<ee:variables >
-							<ee:set-variable variableName="siteCode" ><![CDATA[%dw 2.0
+						<ee:variables>
+							<ee:set-variable variableName="siteCode"><![CDATA[%dw 2.0
 output application/java
 ---
 payload.siteCode default ""]]></ee:set-variable>
-							<ee:set-variable variableName="sarfCode" ><![CDATA[%dw 2.0
+							<ee:set-variable variableName="sarfCode"><![CDATA[%dw 2.0
 output application/java
 ---
 payload.sarfCode default ""]]></ee:set-variable>
 						</ee:variables>
 					</ee:transform>
-					<choice doc:name="siteCode and sarfCode exists?" doc:id="e17ada41-5082-49af-bf1f-82088b90bb91" >
+					<choice doc:name="siteCode and sarfCode exists?" doc:id="e17ada41-5082-49af-bf1f-82088b90bb91">
 						<when expression="#[isEmpty(vars.siteCode) and isEmpty(vars.sarfCode)]">
 							<logger level="INFO" doc:name="No Site Code or SARF Code Found" doc:id="be1bbe6a-aa41-449b-80d7-de316b7530f1" message='#[output application/json&#10;---&#10;"No Site Code or SARF Code Found - $(payload.id)"]' category="${app.log.category}" />
 							<ee:transform doc:name="Update Result Summary" doc:id="d7fd11f4-9522-4bc2-9557-fa08d3e59108">
@@ -126,7 +126,7 @@ var summary = vars.resultSummary
 								</ee:variables>
 							</ee:transform>
 						</when>
-						<otherwise >
+						<otherwise>
 							<try doc:name="Try" doc:id="f64ab517-7caa-42a1-8494-8d572974998c">
 						<ee:transform doc:name="Set bcQueryParams" doc:id="1648964e-0779-41b2-a449-3bd6c1d034fc">
 						<ee:message>
@@ -146,11 +146,11 @@ var filters = {
 							</ee:variables>
 					</ee:transform>
 						<flow-ref doc:name="sys-business-central-api-get-dimension-subflow" doc:id="2ba18ceb-9eb2-4217-8dc0-06a3f22f4ecf" name="sys-business-central-api-get-dimension-subflow" target="dimension" />
-						<ee:transform doc:name="Check Routing" doc:id="bd0f2690-8ea0-45fc-b8bc-1ca0bb3105d0" >
-									<ee:message >
+						<ee:transform doc:name="Check Routing" doc:id="bd0f2690-8ea0-45fc-b8bc-1ca0bb3105d0">
+									<ee:message>
 									</ee:message>
-									<ee:variables >
-										<ee:set-variable variableName="route" ><![CDATA[%dw 2.0
+									<ee:variables>
+										<ee:set-variable variableName="route"><![CDATA[%dw 2.0
 output application/json
 
 var siteCodeExist = vars.dimension.data.code contains vars.siteCode
@@ -159,9 +159,9 @@ var sarfCodeExist = vars.dimension.data.code contains vars.sarfCode
 if (!isEmpty(vars.siteCode) and !isEmpty(vars.sarfCode) and !siteCodeExist and sarfCodeExist) "RENAME" else "REGULAR"]]></ee:set-variable>
 									</ee:variables>
 								</ee:transform>
-								<choice doc:name="Invoke Rename API?" doc:id="2f087c17-5e25-4336-ae68-f6ed0935278c" >
-									<when expression="#[vars.route == 'RENAME']"/>
-									<otherwise >
+								<choice doc:name="Invoke Rename API?" doc:id="2f087c17-5e25-4336-ae68-f6ed0935278c">
+									<when expression="#[vars.route == 'RENAME']" />
+									<otherwise>
 										<choice doc:name="Dimension Already Exist?" doc:id="744f4d4b-2ecc-4183-9f29-9c3caf61a032">
 							<when expression="#[sizeOf(vars.dimension.data) &gt; 0]">
 								<ee:transform doc:name="Set Update Dimension Payload" doc:id="f99bada9-a9a6-450e-bb6e-9e1cffae13bb">
@@ -235,8 +235,8 @@ false]]></ee:set-variable>
 					
 				</foreach>
 				</when>
-				<otherwise >
-					<logger level="INFO" doc:name="No Site Found" doc:id="67cd0916-4dd5-4d3a-8bd6-7bcf4885a86c" message="No Site Found" category="${app.log.category}"/>
+				<otherwise>
+					<logger level="INFO" doc:name="No Site Found" doc:id="67cd0916-4dd5-4d3a-8bd6-7bcf4885a86c" message="No Site Found" category="${app.log.category}" />
 				</otherwise>
 				</choice>
 				<choice doc:name="Check pageNo" doc:id="f8fcaf40-7973-4d30-865d-5fa245bef7a3">
@@ -256,7 +256,7 @@ nextPage]]></ee:set-variable>
 				<flow-ref doc:name="impl-site-to-dimension-paging-subflow" doc:id="0e2079bc-9440-48d0-9392-d5f3caf105b5" name="impl-site-to-dimension-paging-subflow" />
 			</when>
 			<otherwise>
-				<logger level="INFO" doc:name="Last page" doc:id="54f79cc0-e787-4933-8209-4be89b40f2db" message="Last page. Record count: #[sizeOf(vars.site.data)] | Total Records: #[vars.retrieveRecordCount]" category="${app.log.category}"/>
+				<logger level="INFO" doc:name="Last page" doc:id="54f79cc0-e787-4933-8209-4be89b40f2db" message="Last page. Record count: #[sizeOf(vars.site.data)] | Total Records: #[vars.retrieveRecordCount]" category="${app.log.category}" />
 				<logger level="INFO" doc:name="END - Get Project Impl Paging" doc:id="9897163c-3bd2-4f9b-a286-32dd930e4cab" message="END - Get Project Impl Paging Subflow - PageNo: #[vars.pageNo] " category="${app.log.category}" />
 			</otherwise>
 		</choice>
