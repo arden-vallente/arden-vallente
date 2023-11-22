@@ -4,7 +4,7 @@ var site = payload
 ---
 {
 	"dimensionCode": Mule::p('bc.dimension.code.default'),
-	"code": site.siteCode,
+	"code": vars.siteCodeToBC,
 	"name": site.siteName,
 	"blocked": (if (lower(site.siteStatus) contains ('decommissioned')) true else false)
 }
