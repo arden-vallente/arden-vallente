@@ -5,6 +5,18 @@
 	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd">
+	<sub-flow name="impl-site-to-dimension-sync-send-email-subflow" doc:id="e6705824-cfea-4b87-99fd-31ca869aaf19" >
+		<choice doc:name="Send Email Notification?" doc:id="159d36f7-3831-49a8-a694-0fe8d4fa7317" >
+			<when expression="#[sizeOf(vars.site.data) &gt; 0]">
+				<ee:transform doc:name="Set Email Notification" doc:id="d7de0ac7-9559-4956-9101-172dc67c0af1">
+			<ee:message>
+				<ee:set-payload resource="dwl/request/dwl-email-request.dwl" />
+			</ee:message>
+		</ee:transform>
+				<flow-ref doc:name="sys-email-api-send-subflow" doc:id="296b755b-6d11-42f3-8e36-42bd9b3bbfba" name="sys-email-api-send-subflow" />
+			</when>
+		</choice>
+	</sub-flow>
 	<sub-flow name="impl-site-to-dimension-sync-subflow" doc:id="adf98f0d-ec0a-47c8-a6af-17a0e9f53c2d" >
 		<logger level="INFO" doc:name="START - Site Sync Implem" doc:id="2d4aebab-28fd-4da8-acab-46dc6a9a94c6" category="${app.log.category}" message="START -  Site Sync Implem"/>
 		<ee:transform doc:name="Set OS Key, DefaultValue, pageNo, resultSummary" doc:id="c6cecd10-eb2f-44b8-9004-c76eb2c7743a" >
@@ -52,6 +64,9 @@ now() as String {
 		<flow-ref doc:name="sys-object-store-api-get-record-subflow" doc:id="b7a8f8cf-c489-4f0b-9262-03a6f611a9f1" name="sys-object-store-api-get-record-subflow" target="lastSyncDate"/>
 		<flow-ref doc:name="impl-site-to-dimension-paging-subflow" doc:id="7967d5f1-9ad5-4126-8402-308c2b3b8bb6" name="impl-site-to-dimension-paging-subflow"/>
 		<logger level="INFO" doc:name="Log Site to Dimension Summary" doc:id="e4251ed2-a92a-4ee4-916b-df24a08ec52f" message="Site to Dimension Summary Result: #[vars.resultSummary] | Sync Date: #[vars.currentSyncDate]" category="${app.log.category}" />
+		<async doc:name="Async" doc:id="b67249f5-0dc0-45aa-9748-6f5ca9236e27" >
+			<flow-ref doc:name="impl-site-to-dimension-sync-send-email-subflow" doc:id="9776fa3d-6ec6-48d1-98a6-95296cbca9e0" name="impl-site-to-dimension-sync-send-email-subflow" />
+		</async>
 		<ee:transform doc:name="Update Last Sync Date" doc:id="1f51a0d7-c9a5-43b6-83f8-5fa17e7c6529">
 					<ee:message>
 						<ee:set-payload><![CDATA[%dw 2.0

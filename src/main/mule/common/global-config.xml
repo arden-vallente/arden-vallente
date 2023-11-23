@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:os="http://www.mulesoft.org/schema/mule/os"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties"
+	xmlns:os="http://www.mulesoft.org/schema/mule/os"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/os http://www.mulesoft.org/schema/mule/os/current/mule-os.xsd
-http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
 	
 	<http:request-config name="HTTP_Request_configuration_sys-sitetracker-api" doc:name="HTTP Request configuration" doc:id="6a4d4a5b-0e7c-4fb8-9b87-0656eb2e6583" basePath="${sys.sitetracker.basepath}" responseTimeout="${sys.sitetracker.response.timeout}">
 		<http:request-connection protocol="${sys.sitetracker.protocol}" host="${sys.sitetracker.host}" port="${sys.sitetracker.port}" connectionIdleTimeout="${sys.sitetracker.idle.timeout}" >
@@ -27,4 +28,11 @@ http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/sc
 	<configuration-properties doc:name="Configuration properties" doc:id="94261cb3-4e57-4536-a517-bfb8c203e047" file="config/common/common.properties" />
 <!-- 	<import doc:name="Import" doc:id="ac55c74f-cd83-4f73-9813-1e1a68378082" file="forty-south-common-util.xml" /> -->
 	<secure-properties:config name="Secure_Properties_Config" doc:name="Secure Properties Config" doc:id="106c46cc-521d-4760-b9eb-27251f3ab489" file="config/${env}/secure-config.properties" key="${secure.key}" />
+	<email:smtp-config name="Email_SMTP" doc:name="Email SMTP" doc:id="9e49065d-ea35-4318-9658-7b46d93ea843" >
+		<email:smtp-connection host="${email.smtp.host}" port="${email.smtp.port}" user="${email.smtp.username}" password="${email.smtp.password}" connectionTimeout="50" readTimeout="50" writeTimeout="50" >
+			<email:properties >
+				<email:property key="mail.smtp.starttls.enable" value="true" />
+			</email:properties>
+		</email:smtp-connection>
+	</email:smtp-config>
 </mule>

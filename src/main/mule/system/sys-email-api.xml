@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:email="http://www.mulesoft.org/schema/mule/email" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/email http://www.mulesoft.org/schema/mule/email/current/mule-email.xsd">
+	<sub-flow name="sys-email-api-send-subflow" doc:id="3fdb584a-cdec-44b5-9567-f6d5858689c0" >
+		<logger level="INFO" doc:name="START - Send Email" doc:id="0613fa08-5e60-4954-bc34-294c4ebe3f17" message="START - Send Email Request" category="${app.log.category}" />
+		<email:send doc:name="Send" doc:id="6a8d2ff2-e620-4192-9ed5-0033ad04f773" config-ref="Email_SMTP" fromAddress="${email.address.from}" subject="${email.subject}" toAddresses="#[(Mule::p('email.address.to') as String) splitBy(',')]">
+			<email:body contentType="text/html" />
+		</email:send>
+		<logger level="INFO" doc:name="END - Send Email" doc:id="2a2e99f7-7dec-4987-b7a4-95e186178da3" message="END - Send Email Response | Success" category="${app.log.category}" />
+	</sub-flow>
+</mule>

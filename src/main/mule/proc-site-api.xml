@@ -6,8 +6,9 @@
 	<flow name="proc-site-api-flow" doc:id="d8f8178b-5879-4628-b064-629d04ec7bd5" >
 		<scheduler doc:name="Site Sync" doc:id="35ee3b99-25a5-4f39-bc61-8236a5ed1742" >
 			<scheduling-strategy >
-				<cron expression="${app.scheduler.site.sync.cron}" timeZone="${app.datetime.timezone}"/>
-				<!-- <cron expression="0 0 0/2 1/1 * ? *" timeZone="NZ" /> -->
+				<!-- <cron expression="${app.scheduler.site.sync.cron}" timeZone="${app.datetime.timezone}"/> -->
+				<fixed-frequency timeUnit="MINUTES" />
+				
 			</scheduling-strategy>
 		</scheduler>
 		<logger level="INFO" doc:name="START - Site Sync" doc:id="5b6f697a-de30-4d67-a58c-b79278efea9c" />
