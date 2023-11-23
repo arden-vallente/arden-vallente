@@ -73,7 +73,7 @@ http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/htt
 		<logger level="INFO" doc:name="START - Rename Dimension" doc:id="6a0abcb2-f77b-4c1b-b306-40963d01f78f" message="START - Rename Dimension | Payload: #[payload]" category="${app.log.category}"/>
 		<until-successful maxRetries="${retry.attempt.max}" doc:name="Until Successful" doc:id="fd648f91-5926-4374-bbb9-fcdc6805977e" millisBetweenRetries="${retry.attempt.wait}">
 			<try doc:name="Try" doc:id="11439964-c25e-4959-a228-d568823b5c1a">
-			<http:request method="GET" doc:name="RENAME /sys-business-central-api/dimension" doc:id="65467c4c-f232-46e0-be63-9a887f5db1fd" config-ref="HTTP_Request_configuration_sys-business-central-api" path="${sys.bc.path.dimension.rename}" />
+			<http:request method="POST" doc:name="RENAME /sys-business-central-api/dimension" doc:id="65467c4c-f232-46e0-be63-9a887f5db1fd" config-ref="HTTP_Request_configuration_sys-business-central-api" path="${sys.bc.path.dimension.rename}" />
 			<error-handler ref="system-error-handler" />
 		</try>
 		</until-successful>
