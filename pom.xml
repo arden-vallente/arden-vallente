@@ -4,7 +4,7 @@
 
 	<groupId>c43a7f8f-2300-403f-ae3d-dbe5dbfd5396</groupId>
 	<artifactId>proc-site-api</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<packaging>mule-application</packaging>
 
 	<name>proc-site-api</name>
